@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DRILL — IL PA Exam</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --asphalt:#121315;--slate:#1d1f23;--line:#2c2f35;--chalk:#f2f0eb;--dim:#8b8e96;
+    --gold:#ffd23f;--right:#3ddc84;--wrong:#ff5a52;--blue:#5aa7ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--asphalt);color:var(--chalk);font-family:'Archivo',system-ui,sans-serif;max-width:520px;margin:0 auto;padding:14px 14px 40px}
+  header{display:flex;justify-content:space-between;align-items:baseline}
+  h1{font-family:'Archivo Black',sans-serif;font-size:26px;letter-spacing:1px}
+  h1 span{color:var(--gold)}
+  .score{font-family:'Archivo Black',sans-serif;font-size:15px;color:var(--gold)}
+  .sub{color:var(--dim);font-size:12px;margin:2px 0 12px;text-transform:uppercase;letter-spacing:1.5px}
+  .filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .chip{background:var(--slate);border:1px solid var(--line);color:var(--dim);border-radius:99px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Archivo',sans-serif}
+  .chip.on{color:var(--asphalt);background:var(--gold);border-color:var(--gold)}
+  .qcard{background:var(--slate);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+  .qmeta{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
+  .qmeta .seen{color:var(--blue)}
+  .qtext{font-size:16px;font-weight:600;line-height:1.45;margin-bottom:14px}
+  .opt{width:100%;text-align:left;background:var(--asphalt);border:1px solid var(--line);color:var(--chalk);border-radius:10px;padding:13px 14px;font-size:14px;font-family:'Archivo',sans-serif;font-weight:600;margin-bottom:8px;cursor:pointer;line-height:1.35}
+  .opt:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .opt.right{background:rgba(61,220,132,.15);border-color:var(--right);color:var(--right)}
+  .opt.wrong{background:rgba(255,90,82,.12);border-color:var(--wrong);color:var(--wrong)}
+  .opt.faded{opacity:.4}
+  .exp{display:none;background:var(--asphalt);border-left:4px solid var(--gold);border-radius:8px;padding:11px 13px;font-size:13px;line-height:1.5;color:var(--chalk);margin-top:4px}
+  .exp .cite{color:var(--dim);font-size:11px;display:block;margin-top:5px;letter-spacing:.5px}
+  .next{display:none;width:100%;border:none;border-radius:12px;padding:16px;font-family:'Archivo Black',sans-serif;font-size:16px;letter-spacing:1px;background:var(--gold);color:var(--asphalt);cursor:pointer;margin-top:10px}
+  .statsbar{display:flex;gap:8px;margin-bottom:12px}
+  .stat{flex:1;background:var(--slate);border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:center}
+  .stat b{display:block;font-family:'Archivo Black',sans-serif;font-size:17px}
+  .stat span{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+  .stat b.g{color:var(--right)} .stat b.y{color:var(--gold)} .stat b.r{color:var(--wrong)}
+  .mast{margin-top:14px}
+  .mrow{margin-bottom:9px}
+  .mlabel{display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-bottom:3px;text-transform:uppercase;letter-spacing:1px}
+  .mtrack{height:7px;background:var(--slate);border-radius:99px;overflow:hidden}
+  .mfill{height:100%;background:var(--gold);border-radius:99px;width:0%}
+  .ghost{background:none;border:1px solid var(--line);color:var(--dim);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'Archivo',sans-serif;text-transform:uppercase}
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--chalk);color:var(--asphalt);font-weight:700;font-size:13px;padding:9px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header><h1>DRILL<span>.</span></h1><div class="score" id="streak"></div></header>
+<div class="sub">Illinois Public Adjuster — IL-PubAdj17</div>
+
+<div class="statsbar">
+  <div class="stat"><b id="sToday">0</b><span>Today</span></div>
+  <div class="stat"><b class="g" id="sAcc">—</b><span>Accuracy</span></div>
+  <div class="stat"><b class="r" id="sWeak">0</b><span>Weak Qs</span></div>
+</div>
+
+<div class="filters" id="filters">
+  <button class="chip on" data-f="all">All</button>
+  <button class="chip" data-f="law">IL Law</button>
+  <button class="chip" data-f="claims">Carrier Rules</button>
+  <button class="chip" data-f="concepts">Concepts</button>
+  <button class="chip" data-f="product">Policies</button>
+  <button class="chip" data-f="weak">Weak Spots</button>
+</div>
+
+<div class="qcard">
+  <div class="qmeta"><span id="qCat"></span><span class="seen" id="qSeen"></span></div>
+  <div class="qtext" id="qText"></div>
+  <div id="opts"></div>
+  <div class="exp" id="exp"></div>
+  <button class="next" id="nextBtn">NEXT →</button>
+</div>
+
+<div class="mast" id="mastery"></div>
+<div class="foot">
+  <span class="sub" style="margin:0">Bank: <span id="bankN"></span> questions</span>
+  <button class="ghost" id="resetBtn">Reset Progress</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Question bank — derived from the verified Illinois PA study guide (215 ILCS 5/1501-1615, 50 Ill. Admin. Code 919 & 3118).
+// cat: law=IL statutes/rules, claims=carrier conduct/timelines, concepts=insurance concepts, product=policy/product knowledge
+const Q=[
+{c:"law",q:"Minimum surety bond or irrevocable letter of credit for an Illinois PA?",o:["$10,000","$20,000","$50,000","$100,000"],a:2,e:"$50,000 minimum financial responsibility.",x:"215 ILCS 5/1560(a)"},
+{c:"law",q:"Resident PA license fee in Illinois?",o:["$92 annually","$250 every 2 years","$500 every 2 years","$50 annually"],a:1,e:"Resident: $250 biennially. Nonresident: $500.",x:"§ 1563(1)"},
+{c:"law",q:"Nonresident PA license fee?",o:["$250 every 2 years","$350 every 2 years","$500 every 2 years","$500 annually"],a:2,e:"Nonresident fee is $500 every 2 years.",x:"§ 1563(1)"},
+{c:"law",q:"Business entity PA license fee?",o:["$100 / 2 yrs","$250 / 2 yrs","$500 / 2 yrs","$1,000 / 2 yrs"],a:1,e:"Business entity: $250 biennially, same as resident individual.",x:"§ 1563(2)"},
+{c:"law",q:"Continuing education required each biennium?",o:["12 hrs incl 2 ethics","20 hrs incl 4 ethics","24 hrs incl 3 ethics","30 hrs incl 5 ethics"],a:2,e:"24 hours biennially including 3 hours of ethics.",x:"§ 1565(a)"},
+{c:"law",q:"CE must be completed how long before renewal date?",o:["By renewal date","15 days before","30 days before","60 days before"],a:2,e:"CE must be done at least 30 days before renewal.",x:"Licensing pathway"},
+{c:"law",q:"How long must a PA retain transaction records?",o:["3 years after close","5 years after termination","7 years after termination","10 years after signing"],a:2,e:"7 years after termination of the transaction, open to Director examination.",x:"§ 1585"},
+{c:"law",q:"Minimum age for an Illinois PA license?",o:["16","18","21","25"],a:1,e:"18 years minimum.",x:"§ 1525(b)(1)"},
+{c:"law",q:"A lapsed license may be reinstated within 12 months by paying:",o:["The standard renewal fee","Double the unpaid renewal fee","A $1,000 penalty","Nothing — retake the exam"],a:1,e:"Within 12 months, penalty is double the unpaid renewal fee.",x:"§ 1545(e)"},
+{c:"law",q:"The insured may rescind a PA contract within:",o:["3 days of signing","5 business days after signing","5 business days after the insurer receives the contract copy","10 calendar days of loss"],a:2,e:"Clock starts when the INSURER receives the copy — not at signing.",x:"§ 1575(j)"},
+{c:"law",q:"Valid methods for an insured to cancel a PA contract include all EXCEPT:",o:["Certified/registered mail","Personal service","Email","Text message"],a:3,e:"Certified mail, personal service, or email. Text is not listed.",x:"§ 1575(j)"},
+{c:"law",q:"After execution, the PA must send the insurer an exact contract copy by email within:",o:["24 hours","3 business days","5 business days","10 business days"],a:2,e:"5 business days of execution.",x:"§ 1575(j)"},
+{c:"law",q:"If the insured rescinds, the PA must return anything of value within:",o:["5 business days","10 business days","15 business days","30 days"],a:2,e:"15 business days.",x:"§ 1575(j)"},
+{c:"law",q:"If the insurer pays or commits in writing to policy limits within 5 business days of the loss being reported, the PA may collect:",o:["The full contracted percentage","Half the contracted percentage","Only reasonable hourly compensation for services rendered","Nothing at all"],a:2,e:"No percentage commission — hourly only, and PA must tell the insured recovery may not increase.",x:"§ 1575(c)"},
+{c:"law",q:"Maximum PA fee on a personal residence claim in Illinois?",o:["10% — but only during catastrophes","10% — blanket cap, no exceptions","15% with written consent","20% with Director approval"],a:1,e:"Blanket 10% cap on personal residence claims — cannot be waived by contract.",x:"§ 1570(e)"},
+{c:"law",q:"For NON-personal-residence property, the 10% fee cap applies:",o:["Always","Never","Only during a declared catastrophic event","Only for claims over $100,000"],a:2,e:"Cap kicks in only during declared catastrophes for non-personal-residence property.",x:"§ 1570"},
+{c:"law",q:"A catastrophic event declaration is effective for:",o:["30 days, renewable 30 days","60 days, renewable 60 days","90 days, renewable in 30-day intervals, county-by-county","1 year statewide"],a:2,e:"90 days, renewable in 30-day intervals, applied county-by-county.",x:"§ 1570"},
+{c:"law",q:"The Director must act on a fee-cap exception request within:",o:["5 business days","10 business days","15 business days","30 days"],a:0,e:"5 business days.",x:"§ 1570"},
+{c:"law",q:"Under Rule 3118.90, the PA fee must be based on:",o:["The gross settlement including deductible","The net claim payment, excluding the deductible","The RCV estimate","The first check only"],a:1,e:"Fee excludes the deductible — based only on net claim payment by the insurer.",x:"Rule 3118.90"},
+{c:"law",q:"PA contracts must be printed in no less than:",o:["8-point font","10-point font","12-point font","14-point font"],a:1,e:"At least 10-point font, with form number/edition in the lower left corner.",x:"Rule 3118.80"},
+{c:"law",q:"Before using a contract form, a PA must:",o:["Have an attorney review it","File it with the IDOI for approval","Register it with Pearson VUE","Notarize it"],a:1,e:"Contract forms must be filed with and approved by IDOI before use.",x:"§ 1575; Rule 3118.80"},
+{c:"law",q:"Which is a PROHIBITED term in an Illinois PA contract?",o:["Naming the PA as co-payee on checks","A power of attorney letting the PA act in place of the insured","Stating the exact compensation percentage","Disclosing financial interests"],a:1,e:"Power of attorney provisions are expressly forbidden. Co-payee is permitted.",x:"§ 1575(e)(5)"},
+{c:"law",q:"Which contract term is also prohibited?",o:["Collecting the entire fee from the first check","Requiring 10-point font","An entire-agreement statement","A description of services"],a:0,e:"Fees on money not yet paid, or the entire fee from the first check, are prohibited.",x:"§ 1575(e)"},
+{c:"law",q:"A hold-harmless clause protecting the PA from their own negligence is:",o:["Allowed with disclosure","Allowed if mutual","Prohibited","Required"],a:2,e:"Indemnification/hold-harmless for the PA's own negligence is a prohibited term.",x:"§ 1575(e)"},
+{c:"law",q:"The pre-signing disclosure must explain:",o:["The insurer's complaint history","The three types of adjusters: company, independent, public","The expected settlement amount","The PA's prior claims"],a:1,e:"Plus: insured is not required to hire a PA; PA does not represent insurer or IDOI; fee is the insured's obligation.",x:"§ 1575(f)"},
+{c:"law",q:"PA solicitation is prohibited between:",o:["6 p.m. and 9 a.m.","7 p.m. and 8 a.m.","8 p.m. and 8 a.m.","9 p.m. and 6 a.m."],a:1,e:"No soliciting 7:00 p.m. – 8:00 a.m. Signing a previously arranged contract is not soliciting.",x:"§ 1590(b)"},
+{c:"law",q:"A PA may NOT solicit while:",o:["It is raining","The fire department is at the damaged premises","The insured is at work","An adjuster is inspecting"],a:1,e:"No soliciting while the fire department is on site or while the loss-producing occurrence continues.",x:"§ 1590(b)"},
+{c:"law",q:"The statutory fiduciary standard requires a PA to serve with:",o:["Reasonable care","Objectivity and complete loyalty to the client's interests alone","Good faith toward both parties","Professional courtesy"],a:1,e:"The exact statutory phrase: objectivity and complete loyalty — to the client alone, never the carrier.",x:"§ 1590(a)"},
+{c:"law",q:"A PA may acquire an interest in salvage only with:",o:["Verbal permission anytime","The insurer's approval","The insured's written permission obtained AFTER settlement","Director approval"],a:2,e:"Written permission, and only after the claim is settled.",x:"§ 1590(e)"},
+{c:"law",q:"When recommending a contractor, Rule 3118.90 requires the PA to present:",o:["One licensed bid","At least two competitive bids","Three bids minimum","The cheapest option"],a:1,e:"At least two competitive bids, plus verify liability insurance, performance bond, licenses, and written warranty.",x:"Rule 3118.90"},
+{c:"law",q:"If a PA refers an insured to a contractor, the PA:",o:["Has no further obligation","Warrants the workmanship and is responsible for deficient work costs","Gets an automatic referral fee","Must supervise daily"],a:1,e:"The PA warrants workmanship and bears costs to complete or repair deficient work.",x:"Rule 3118.90"},
+{c:"law",q:"A client who chooses a contractor other than the PA's recommendation:",o:["May be charged a higher fee","Must sign a waiver","Shall NOT be charged higher fees","Voids the contract"],a:2,e:"No fee penalty for choosing a different contractor.",x:"Rule 3118.90; Bulletin 2024-16"},
+{c:"law",q:"A PA agrees to a settlement without the insured's knowledge. This is:",o:["Fine if favorable","Prohibited — consent is required","Allowed under power of attorney","Allowed for small claims"],a:1,e:"No settlement without the insured's knowledge and consent.",x:"§ 1590(k)"},
+{c:"law",q:"A PA advising a client on their legal rights to sue the insurer is:",o:["Part of the job","Unauthorized practice of law — prohibited","Fine with disclosure","Allowed if the PA passed the exam"],a:1,e:"PAs cannot provide legal advice or practice law.",x:"§ 1590(l)"},
+{c:"law",q:"A PA may advance money to an insured pending adjustment:",o:["Never","Up to $1,000","Only for emergency services","With 10% interest"],a:2,e:"Advancing value is prohibited EXCEPT for emergency services.",x:"§ 1590(g)"},
+{c:"law",q:"Client funds held by a PA must be deposited in:",o:["The PA's business account","An interest-bearing trust, interest to client","A non-interest-bearing escrow/trust at an FDIC-insured institution","Any bank account"],a:2,e:"Non-interest-bearing escrow or trust, FDIC-insured, in the PA's home state or where the loss occurred.",x:"§ 1580"},
+{c:"law",q:"Maximum civil penalty: per cause / total?",o:["$5,000 / $50,000","$10,000 / $100,000","$25,000 / $250,000","$10,000 / unlimited"],a:1,e:"Up to $10,000 per cause, $100,000 maximum total.",x:"§ 1555(d)"},
+{c:"law",q:"After license revocation, a PA may reapply after:",o:["1 year","3 years","5 years","Never"],a:2,e:"Ineligible to reapply for 5 years. Suspensions can also last up to 5 years.",x:"§ 1555(f)"},
+{c:"law",q:"Acting as a PA without a license is:",o:["A civil violation only","A Class B misdemeanor","A Class A misdemeanor","A Class 4 felony"],a:2,e:"Unlicensed PA activity = Class A misdemeanor.",x:"§ 1610"},
+{c:"law",q:"Misappropriating or converting client funds is:",o:["A Class A misdemeanor","A Class 4 felony","A civil matter","Grounds for fine only"],a:1,e:"Class 4 felony — and a fiduciary breach.",x:"§ 1610"},
+{c:"law",q:"For a felony conviction, the Director considers whether this much time has passed without subsequent conviction:",o:["2 years","5 years since conviction or 3 since release, whichever is later","10 years flat","7 years since sentencing"],a:1,e:"5 years since felony conviction or 3 years since release from confinement, whichever is later.",x:"§ 1550"},
+{c:"law",q:"A PA must report an administrative action in another state within:",o:["10 days of filing","30 days of final disposition","60 days of final disposition","At renewal"],a:1,e:"30 days of final disposition. Criminal prosecutions: 30 days of initial pretrial hearing.",x:"§ 1595"},
+{c:"law",q:"A PA must notify the Director of an address change within:",o:["10 days","30 days","60 days","90 days"],a:1,e:"30 days.",x:"§ 1540"},
+{c:"law",q:"If a nonresident PA's home-state license terminates, the Illinois license:",o:["Continues to renewal","Terminates immediately","Converts to resident","Suspends 90 days"],a:1,e:"Terminates immediately — reciprocity depends on the home-state license.",x:"§ 1540"},
+{c:"law",q:"An applicant may be exempt from the Illinois exam if licensed as a PA in another state for at least:",o:["6 months","12 months in good standing","24 months","5 years"],a:1,e:"12 months in good standing. A PA moving to Illinois must apply within 90 days of residency.",x:"§ 1535"},
+{c:"law",q:"A contract entered by an unlicensed person acting as a PA is:",o:["Voidable by the insurer","Valid if fees are reasonable","Void and invalid","Enforceable up to $5,000"],a:2,e:"Void and invalid.",x:"§ 1515(e)"},
+{c:"law",q:"Which person is EXEMPT from PA licensing?",o:["A contractor negotiating settlements","An Illinois attorney acting in professional capacity","A real estate agent estimating damage","An independent adjuster hired by the insured"],a:1,e:"Exempt: attorneys, life/health/annuity negotiators, technical-assistance-only experts, health providers filing forms, insurer-to-insurer subrogation.",x:"§ 1515(d)"},
+{c:"law",q:"A photographer hired only to document damage, who never negotiates:",o:["Needs a PA license","Is exempt — technical assistance only","Needs a producer license","Is exempt only under $10,000"],a:1,e:"Technical assistance persons (photographers, engineers, estimators, PIs) who do not negotiate are exempt.",x:"§ 1515(d)"},
+{c:"law",q:"Public adjusters handle which claims?",o:["First-party AND third-party","First-party property claims only","Liability claims","Life and health claims"],a:1,e:"First-party only — the insured's own policy. Never liability/third-party.",x:"§ 1510"},
+{c:"law",q:"After passing the exam, you must wait how long before applying for the license?",o:["No wait","5 days","30 days","90 days"],a:1,e:"Wait 5 days after passing, then apply through NIPR with the $250 fee.",x:"Licensing pathway"},
+{c:"law",q:"Before entering ANY PA contracts, you need:",o:["Just the license","Just IDOI contract approval","BOTH the IDOI-approved contract form AND the issued license","A surety bond only"],a:2,e:"Two separate processes — both must be complete first.",x:"Licensing pathway"},
+{c:"law",q:"Fingerprinting for an Illinois PA license:",o:["Is optional","Is required — ISP and FBI checks","Only for nonresidents","Only after a complaint"],a:1,e:"Required via Illinois-approved Live Scan vendor; ISP and FBI background checks.",x:"§ 1520"},
+{c:"law",q:"A PA paying a commission to an unlicensed person who is required to be licensed:",o:["Is fine under $500","Violates § 1570(a)","Is allowed with disclosure","Is allowed for referrals only"],a:1,e:"Cannot pay commissions to unlicensed persons required to be licensed; unlicensed persons cannot accept adjusting fees.",x:"§ 1570(a),(b)"},
+{c:"claims",q:"Maximum time for an insurer to acknowledge claim communications?",o:["10 working days","15 working days","21 working days","30 calendar days"],a:1,e:"15 working days — the reasonable promptness standard.",x:"50 IAC 919.40"},
+{c:"claims",q:"Maximum time to begin a prompt investigation when liability is reasonably clear?",o:["15 working days","21 working days","30 calendar days","45 days"],a:1,e:"21 working days — bona fide effort to communicate with all parties.",x:"50 IAC 919.40"},
+{c:"claims",q:"After affirming liability with amount determined, the insurer must offer payment within:",o:["15 days","21 days","30 days","45 days"],a:2,e:"30 days. Undisputed amounts must also be tendered within 30 days.",x:"50 IAC 919.50"},
+{c:"claims",q:"If a first-party claim is denied, written explanation is due within:",o:["15 working days of denial","21 working days","30 days after investigation and liability determination","60 days of claim"],a:2,e:"30 days after the investigation and determination are completed.",x:"50 IAC 919.50"},
+{c:"claims",q:"The median payment period beyond which fire/extended coverage delay is unreasonable:",o:["30 days","40 calendar days","60 days","75 days"],a:1,e:"40 calendar days.",x:"50 IAC 919.80(d)(7)"},
+{c:"claims",q:"A fire claim unresolved 80 days from report requires the insurer to:",o:["Pay in full","Provide written delay explanation + Notice of Availability of the DOI","Go to arbitration","Request an extension"],a:1,e:"Trigger is 75 calendar days from report (or 25 days after proof of loss, whichever is less).",x:"50 IAC 919.80(d)(7)"},
+{c:"claims",q:"An insurer may require which of the following?",o:["A polygraph examination","An examination under oath, if the policy authorizes it","Proof of loss faster than the policy states","A release notation on a partial-payment check"],a:1,e:"EUO is permitted if authorized by the policy; polygraphs are prohibited.",x:"50 IAC 919.60"},
+{c:"claims",q:"A check may be marked final or a release only if:",o:["The adjuster approves","Policy limits have been paid OR a bona fide dispute exists","The claim exceeds $10,000","The insured agrees verbally"],a:1,e:"Otherwise prohibited.",x:"50 IAC 919"},
+{c:"claims",q:"Illinois defines Actual Cash Value as:",o:["Market value","Replacement cost at time of loss minus depreciation","Purchase price minus deductible","Assessed tax value"],a:1,e:"RCV at time of loss minus depreciation; depreciation worksheets must be provided on request.",x:"50 IAC 919.80(d)(8)"},
+{c:"claims",q:"Section 154.6 (unfair claims practices) can be enforced by:",o:["Private policyholder lawsuits","The Director of Insurance only","Class actions","County prosecutors"],a:1,e:"Regulatory only — NO private right of action. Acts must be knowing or show a persistent tendency.",x:"215 ILCS 5/154.6, 154.5"},
+{c:"claims",q:"Which is an unfair claims practice under § 154.6?",o:["Requesting documentation","Inspecting before payment","Compelling suit by offering substantially less than amounts ultimately recovered","Denying a fraudulent claim"],a:2,e:"Also: misrepresenting facts/provisions, failing to acknowledge promptly, no good-faith settlement when liability is clear, denying without reasonable investigation.",x:"§ 154.6"},
+{c:"claims",q:"Section 155 bad-faith sanctions require the insurer's conduct to be:",o:["Negligent","Vexatious and unreasonable","Fraudulent","Criminal"],a:1,e:"Plus the insured must prevail on the underlying breach of contract claim.",x:"215 ILCS 5/155"},
+{c:"claims",q:"Maximum Section 155 penalty is the LESSER of: 60% of recovery, the excess over the pre-suit offer, or:",o:["$25,000","$50,000","$60,000","$100,000"],a:2,e:"60% / $60,000 / excess over pre-suit offer — whichever is least, plus attorney fees.",x:"215 ILCS 5/155"},
+{c:"claims",q:"Section 155 is best described as:",o:["A standalone cause of action","An extracontractual remedy attached to the contract claim","A criminal statute","An arbitration clause"],a:1,e:"A remedy, not a standalone claim. Courts use a totality-of-circumstances standard.",x:"215 ILCS 5/155"},
+{c:"claims",q:"With every denial or delay explanation, the carrier must include:",o:["A check for partial payment","The Notice of Availability of the Department of Insurance","An appraisal demand","Attorney contact info"],a:1,e:"The DOI availability notice accompanies denials and delay explanations.",x:"50 IAC 919"},
+{c:"concepts",q:"Under indemnity, a $50,000 loss on a property insured for $75,000 pays:",o:["$75,000","$50,000","$25,000","$62,500"],a:1,e:"Lesser of actual loss or policy limit — no better, no worse than pre-loss.",x:"Principle of indemnity"},
+{c:"concepts",q:"Which are EXCEPTIONS to strict indemnity?",o:["Subrogation and contribution","Replacement cost coverage and valued policies","Deductibles","Named perils"],a:1,e:"RCV and valued policies can pay more than strict pre-loss value.",x:"Indemnity"},
+{c:"concepts",q:"For PROPERTY insurance, insurable interest must exist:",o:["At policy inception","At time of loss","At both","At renewal"],a:1,e:"At time of loss. Life insurance: at inception. Sources: ownership, secured creditor, lease, legal liability.",x:"Insurable interest"},
+{c:"concepts",q:"The insurer's right to recover from a negligent third party after paying the insured:",o:["Contribution","Indemnification","Subrogation","Estoppel"],a:2,e:"Subrogation — insurer steps into the insured's shoes. Insured must be made whole first; doesn't apply to life insurance.",x:"Subrogation"},
+{c:"concepts",q:"An insured signs a release with the negligent party before the insurer recovers. The insured has:",o:["Exercised their rights","Impaired the insurer's subrogation rights","Triggered estoppel","Waived the deductible"],a:1,e:"The insured cannot impair subrogation — this can jeopardize the claim.",x:"Subrogation"},
+{c:"concepts",q:"An insurer continues investigating after discovering a policy violation. This may constitute:",o:["Estoppel","Waiver","Concealment","Rebating"],a:1,e:"Waiver = voluntary relinquishment of a known right. Estoppel is court-imposed after reasonable reliance.",x:"Waiver vs estoppel"},
+{c:"concepts",q:"Reservation-of-rights letters and non-waiver agreements exist to:",o:["Speed up settlement","Prevent inadvertent waiver","Force appraisal","Extend deadlines"],a:1,e:"They preserve the insurer's right to deny while investigating.",x:"Waiver"},
+{c:"concepts",q:"Intentional failure to disclose a material fact is:",o:["A representation","Concealment — can void coverage","A warranty","Twisting"],a:1,e:"Representations must be substantially true; warranties literally true (mostly marine); concealment can void.",x:"Utmost good faith"},
+{c:"concepts",q:"Building worth $1,000,000, 80% coinsurance, $500,000 carried, $200,000 loss. Payment?",o:["$200,000","$160,000","$125,000","$100,000"],a:2,e:"(500k ÷ 800k) × 200k = $125,000. Insured eats $75,000 penalty.",x:"Coinsurance formula"},
+{c:"concepts",q:"Building valued $500,000, insured $300,000, 80% coinsurance, $100,000 loss. Insurer pays:",o:["$100,000","$75,000","$60,000","$80,000"],a:1,e:"Required = 400k. (300k ÷ 400k) × 100k = $75,000.",x:"Coinsurance formula"},
+{c:"concepts",q:"ACV $200,000, replacement cost $280,000. Depreciation =",o:["$80,000","$200,000","$280,000","$480,000"],a:0,e:"ACV = RC − Depreciation → 280k − 200k = $80,000.",x:"ACV formula"},
+{c:"concepts",q:"Under RCV coverage, the insured typically receives:",o:["Full RCV upfront","ACV first, recoverable depreciation after repairs are completed","Depreciation only","Market value"],a:1,e:"ACV check first; holdback released once repairs complete.",x:"ACV vs RCV"},
+{c:"concepts",q:"A 2% wind deductible on a $300,000 dwelling =",o:["2% of the loss","$6,000 — calculated on the insured value","$3,000","$600"],a:1,e:"Percentage deductibles compute on insured VALUE, not the loss amount.",x:"Deductibles"},
+{c:"concepts",q:"A franchise deductible means:",o:["A flat dollar amount always applies","Below threshold nothing is paid; above it the ENTIRE loss is paid","The deductible doubles each claim","Only commercial use"],a:1,e:"All-or-nothing threshold structure.",x:"Deductibles"},
+{c:"concepts",q:"Two policies cover one loss: $100k and $300k limits, $80k loss. Pro rata, the $100k policy pays:",o:["$40,000","$20,000","$26,667","$80,000"],a:1,e:"(100k ÷ 400k) × 80k = $20,000. Each insurer pays its share of total limits.",x:"Pro rata contribution"},
+{c:"concepts",q:"Offering a fee discount tied to using the PA's preferred contractor is functionally:",o:["Twisting","Churning","Rebating — prohibited","Smart marketing"],a:2,e:"Rebating = returning value as an inducement. Twisting = replacement via misrepresentation; churning = policies for commissions.",x:"Ethics"},
+{c:"concepts",q:"Mixing client funds with personal funds is called:",o:["Conversion","Commingling","Subrogation","Contribution"],a:1,e:"Commingling violates fiduciary duty. Outright taking = misappropriation (Class 4 felony).",x:"§ 1580, 1610"},
+{c:"product",q:"The four components of a property policy:",o:["Application, binder, rider, endorsement","Declarations, insuring agreement, conditions, exclusions","Premium, limit, deductible, term","Offer, acceptance, consideration, legality"],a:1,e:"Dec page (who/what/limits), insuring agreement (the promise), conditions (duties), exclusions.",x:"Policy structure"},
+{c:"product",q:"Under NAMED perils coverage, the burden of proving cause of loss falls on:",o:["The insurer","The insured","The adjuster","Neither"],a:1,e:"Named perils: insured proves a listed peril caused it. Open perils: insurer must prove an exclusion.",x:"Named vs open perils"},
+{c:"product",q:"Mysterious ceiling stain, HO-3, no known cause. Coverage for the dwelling turns on:",o:["The insured proving a covered peril","The insurer proving an excluded peril caused it","Who filed proof of loss","Automatic denial"],a:1,e:"HO-3 dwelling = open perils → insurer bears the exclusion burden. Can't prove it? Covered.",x:"HO-3 burden of proof"},
+{c:"product",q:"HO-3 covers the dwelling on what basis?",o:["Named perils, ACV","Named perils, RCV","Open perils, ACV","Open perils, RCV"],a:3,e:"Dwelling: open perils at RCV. Personal property: named perils, typically ACV.",x:"HO-3"},
+{c:"product",q:"Which form covers BOTH dwelling and contents on open perils?",o:["HO-2","HO-3","HO-5","HO-8"],a:2,e:"HO-5 Comprehensive — the broadest standard form.",x:"HO forms"},
+{c:"product",q:"HO-4 is designed for:",o:["Condo owners","Renters — personal property only","Older homes","Mobile homes"],a:1,e:"HO-4 renters (named perils, contents). HO-6 condo. HO-7 mobile home. HO-8 older home (ACV).",x:"HO forms"},
+{c:"product",q:"HO-8 exists for homes where:",o:["Flood risk is high","Replacement cost exceeds market value","The owner rents rooms","Construction is fire-resistive"],a:1,e:"Older homes — ACV basis, limited named perils.",x:"HO-8"},
+{c:"product",q:"An insured wants to abandon damaged property to the insurer and collect a total loss:",o:["Allowed with notice","Not allowed — abandonment is prohibited","Allowed for vehicles","Allowed after 60 days"],a:1,e:"The insurer retains the option to repair, rebuild, or replace.",x:"Abandonment"},
+{c:"product",q:"One earring of a $5,000 pair is lost. The pair-and-set clause means the insurer pays:",o:["$5,000","$2,500 automatically","The reduction in value or cost to replace the lost piece","Nothing"],a:2,e:"Not the full set value — only the diminution or replacement of the lost part.",x:"Pair and set"},
+{c:"product",q:"The appraisal clause resolves disputes over:",o:["Coverage questions","The amount of loss","Bad faith","Premiums"],a:1,e:"Amount only. Each side picks an appraiser, they pick an umpire; any two of three bind. Each pays own appraiser; umpire split.",x:"Appraisal clause"},
+{c:"product",q:"Under a mortgage clause, the lender's coverage:",o:["Falls with the homeowner's violations","Is independent — not invalidated by the homeowner's acts","Requires a separate policy","Covers contents"],a:1,e:"Mortgagee protected independently; insurer must give the lender separate cancellation notice.",x:"Mortgage clause"},
+{c:"product",q:"Sworn proof of loss under the Standard Fire Policy is typically due within:",o:["30 days","60 days","90 days","6 months"],a:1,e:"60 days. The 1943 NY SFP also set the 12-month suit limitation and appraisal procedure.",x:"Standard Fire Policy"},
+{c:"product",q:"The 1943 New York Standard Fire Policy established all EXCEPT:",o:["60-day proof of loss","12-month suit limitation","The appraisal procedure","Flood coverage"],a:3,e:"Flood is excluded from standard policies — NFIP is a separate federal program.",x:"SFP / NFIP"},
+{c:"product",q:"A flood destroys a home with a standard HO-3 and no flood coverage. The PA should:",o:["Argue open perils covers it","File it as wind damage","Explain the exclusion and point the insured to NFIP/FEMA","Refer to a bad-faith attorney"],a:2,e:"Filing as wind = fraud. Honesty is the fiduciary duty; NFIP is the flood path.",x:"Fiduciary + NFIP"},
+{c:"product",q:"The insurer broadens coverage with no premium increase. Existing policies:",o:["Must be rewritten","Automatically get the broader coverage via the liberalization clause","Stay unchanged until renewal","Need an endorsement"],a:1,e:"Liberalization clause applies the improvement automatically.",x:"Liberalization"},
+{c:"product",q:"Which is a standard property policy exclusion?",o:["Hail","Lightning","Earthquake","Windstorm"],a:2,e:"Standard exclusions: flood, earthquake, war, intentional acts, wear and tear, nuclear, government action.",x:"Exclusions"},
+{c:"product",q:"Duties after loss include all EXCEPT:",o:["Prompt notice and protecting property","Preparing an inventory and showing the damage","Submitting to EUO and producing records","Abandoning the property to the insurer"],a:3,e:"Abandonment is never a duty — it's prohibited.",x:"Duties after loss"},
+{c:"law",q:"Exam structure: questions / minutes / passing score?",o:["100 / 120 / 75 raw","100 / 165 / 70 scaled","150 / 180 / 70%","80 / 90 / 65 scaled"],a:1,e:"100 scored questions, 165 minutes, scaled 70 (NOT a raw percentage). Test centers only.",x:"IL-PubAdj17"},
+{c:"law",q:"Retake waiting periods after failing?",o:["None","7 days after first fail; 30 days after second+","30 days always","14 / 60 days"],a:1,e:"7 days after the first fail, 30 days after second or subsequent fails.",x:"Pearson VUE"},
+{c:"law",q:"Illinois statute questions make up how much of the exam?",o:["10","25","35","50"],a:1,e:"25 questions IL law, 25 terms/concepts, 35 product knowledge, 10 estimating, 5 policy provisions.",x:"Content outline"}
+];
+
+const KEY='pa-drill-stats';
+const CATS={law:"IL Law",claims:"Carrier Rules",concepts:"Concepts",product:"Policies"};
+const inClaude=typeof window.storage!=='undefined'&&window.storage&&typeof window.storage.get==='function';
+let S={q:{},today:{d:'',n:0,c:0},streak:0};
+let filter='all',cur=-1,answered=false;
+
+const $=id=>document.getElementById(id);
+let toastTimer;
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
+function dkey(){const x=new Date();return x.getFullYear()+'-'+(x.getMonth()+1)+'-'+x.getDate();}
+
+async function load(){
+  try{
+    let raw=null;
+    if(inClaude){const r=await window.storage.get(KEY);raw=r&&r.value;}
+    else{raw=localStorage.getItem(KEY);}
+    if(raw)S=JSON.parse(raw);
+  }catch(e){}
+  if(S.today.d!==dkey())S.today={d:dkey(),n:0,c:0};
+  $('bankN').textContent=Q.length;
+  next();renderStats();
+}
+async function save(){
+  try{
+    if(inClaude)await window.storage.set(KEY,JSON.stringify(S));
+    else localStorage.setItem(KEY,JSON.stringify(S));
+  }catch(e){}
+}
+
+function stat(i){return S.q[i]||{c:0,w:0,s:0};}
+function weight(i){
+  const t=stat(i);
+  if(t.c+t.w===0)return 3;        // unseen
+  if(t.s<0)return 4+Math.min(-t.s,3); // wrong streak — hammer it
+  if(t.s>=3)return .3;            // mastered
+  if(t.s>=1)return 1;
+  return 2;
+}
+function pool(){
+  let idx=Q.map((q,i)=>i);
+  if(filter==='weak')idx=idx.filter(i=>{const t=stat(i);return t.w>0&&t.s<2;});
+  else if(filter!=='all')idx=idx.filter(i=>Q[i].c===filter);
+  return idx.filter(i=>i!==cur).length?idx.filter(i=>i!==cur):idx;
+}
+function pick(){
+  const p=pool();
+  if(!p.length)return -1;
+  const ws=p.map(weight);const tot=ws.reduce((a,b)=>a+b,0);
+  let r=Math.random()*tot;
+  for(let j=0;j<p.length;j++){r-=ws[j];if(r<=0)return p[j];}
+  return p[p.length-1];
+}
+
+function next(){
+  cur=pick();answered=false;
+  $('exp').style.display='none';$('nextBtn').style.display='none';
+  if(cur<0){$('qText').textContent='No weak spots here — clean slate. Switch filters and keep drilling.';$('opts').innerHTML='';$('qCat').textContent='';$('qSeen').textContent='';return;}
+  const q=Q[cur],t=stat(cur);
+  $('qCat').textContent=CATS[q.c];
+  $('qSeen').textContent=t.c+t.w?('seen '+(t.c+t.w)+'× · '+(t.w?t.w+' missed':'clean')):'NEW';
+  $('qText').textContent=q.q;
+  $('opts').innerHTML=q.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+String.fromCharCode(65+j)+'. '+o+'</button>').join('');
+  document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>answer(+b.dataset.j)));
+}
+
+function answer(j){
+  if(answered)return;answered=true;
+  const q=Q[cur];const t=stat(cur);
+  const right=j===q.a;
+  document.querySelectorAll('.opt').forEach(b=>{
+    const k=+b.dataset.j;
+    if(k===q.a)b.classList.add('right');
+    else if(k===j)b.classList.add('wrong');
+    else b.classList.add('faded');
+  });
+  if(right){t.c++;t.s=t.s>0?t.s+1:1;S.streak++;S.today.c++;}
+  else{t.w++;t.s=t.s<0?t.s-1:-1;S.streak=0;}
+  S.q[cur]=t;S.today.n++;
+  $('exp').innerHTML=q.e+'<span class="cite">'+q.x+'</span>';
+  $('exp').style.display='block';
+  $('exp').style.borderLeftColor=right?'var(--right)':'var(--wrong)';
+  $('nextBtn').style.display='block';
+  save();renderStats();
+}
+
+$('nextBtn').addEventListener('click',next);
+
+$('filters').addEventListener('click',e=>{
+  const c=e.target.closest('.chip');if(!c)return;
+  filter=c.dataset.f;
+  document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));
+  next();
+});
+
+function renderStats(){
+  $('sToday').textContent=S.today.n;
+  $('sAcc').textContent=S.today.n?Math.round(100*S.today.c/S.today.n)+'%':'—';
+  let weak=0;Q.forEach((q,i)=>{const t=stat(i);if(t.w>0&&t.s<2)weak++;});
+  $('sWeak').textContent=weak;
+  $('streak').textContent=S.streak>1?'🔥 '+S.streak:'';
+  let html='';
+  for(const c in CATS){
+    const idx=Q.map((q,i)=>i).filter(i=>Q[i].c===c);
+    const mastered=idx.filter(i=>stat(i).s>=2).length;
+    const pct=Math.round(100*mastered/idx.length);
+    html+='<div class="mrow"><div class="mlabel"><span>'+CATS[c]+'</span><span>'+mastered+'/'+idx.length+'</span></div><div class="mtrack"><div class="mfill" style="width:'+pct+'%"></div></div></div>';
+  }
+  $('mastery').innerHTML=html;
+}
+
+$('resetBtn').addEventListener('click',()=>{
+  if(!confirm('Wipe all drill progress?'))return;
+  S={q:{},today:{d:dkey(),n:0,c:0},streak:0};save();next();renderStats();toast('Fresh slate');
+});
+
+load();
+</script>
+</body>
+</html>
