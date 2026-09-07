@@ -110,6 +110,26 @@
     font-family:'Archivo',sans-serif;white-space:nowrap;z-index:10;
   }
   .toast.show{opacity:1}
+
+  /* Additions: original four-button layout and styles above are unchanged. */
+  .extras{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:12px 0;color:var(--dim);font-size:13px}
+  .extras summary{cursor:pointer;color:var(--chalk);font-weight:700;padding:4px 0}
+  .extra-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .extra-actions .ghost{min-height:36px}
+  .field{display:grid;gap:5px;margin-top:12px;color:var(--chalk);font-size:14px}
+  .field input,.field select,.field textarea{width:100%;min-width:0;background:var(--asphalt);color:var(--chalk);border:1px solid var(--line);border-radius:7px;padding:10px;font:16px 'Archivo',system-ui,sans-serif}
+  .field textarea{min-height:72px;resize:vertical}
+  .detail-button{margin-top:8px;min-height:34px}
+  .detail-summary{font-size:13px;color:var(--comeback);margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+  dialog{background:var(--slate);color:var(--chalk);border:1px solid var(--line);border-radius:14px;padding:18px;width:calc(100% - 28px);max-width:480px;max-height:90dvh;margin:auto;overflow:auto}
+  dialog::backdrop{background:rgba(0,0,0,.7)}
+  dialog h2{font-size:18px} dialog .ghost{color:var(--chalk);font-size:13px;min-height:42px}
+  .save-detail{background:var(--talked)!important;color:var(--asphalt)!important}
+  #statusNotice{color:var(--comeback);font-size:13px;white-space:pre-wrap;margin:10px 0}
+  #statusNotice:empty{display:none}
+  #progress{font-size:13px;color:var(--dim);margin-top:10px;line-height:1.6}
+  .chip[data-f="followups"].on{background:var(--comeback);border-color:var(--comeback)}
+  .house{font-size:16px} /* Avoid iPhone input zoom; original field width retained. */
 </style>
 </head>
 <body>
@@ -138,129 +158,126 @@
     <button class="chip" data-f="comeback">Come Back</button>
     <button class="chip" data-f="talked">Talked</button>
     <button class="chip" data-f="today">Today</button>
+    <button class="chip" data-f="followups">Follow-ups</button>
   </div>
+
+
+  <details class="extras" id="sessionPanel"><summary id="sessionSummary">Storm / session & backup</summary>
+    <label class="field">Storm / date<input id="storm" placeholder="July 27 wind"></label>
+    <label class="field">Area<input id="area" placeholder="Homewood"></label>
+    <label class="field">Door target (optional)<input id="target" type="number" min="1" step="1" inputmode="numeric"></label>
+    <div class="extra-actions"><button class="ghost" id="startSession">Start new session</button><button class="ghost" id="endSession">End session</button></div>
+    <div class="extra-actions"><button class="ghost" id="backupBtn">Backup JSON</button><button class="ghost" id="restoreBtn">Import backup</button><button class="ghost" id="extendedCsvBtn">Detailed CSV</button><button class="ghost" id="undoBtn" disabled>Undo</button></div>
+    <input id="importFile" type="file" accept="application/json,.json" hidden>
+    <div id="progress"></div>
+  </details>
+  <div id="statusNotice" role="status"></div>
+  <dialog id="detailDialog" aria-labelledby="detailTitle"><form id="detailForm">
+    <div class="erow"><h2 id="detailTitle">Visit details</h2><button type="button" class="ghost" id="closeDetail">Close</button></div>
+    <label class="field">Name<input id="contactName" autocomplete="name"></label>
+    <label class="field">Phone<input id="phone" type="tel" autocomplete="tel"></label>
+    <label class="field">Conversation / next stage<select id="stage">
+      <option value="">Not specified</option><option value="inspection_allowed">Inspection allowed</option><option value="inspection_scheduled">Inspection scheduled</option><option value="follow_up">Follow up</option><option value="thinking">Needs time</option><option value="ready_to_sign">Ready to sign</option><option value="signed">Signed</option><option value="not_moving_forward">Not moving forward</option>
+    </select></label>
+    <label class="field">Inspection result<select id="inspection"><option value="">Not recorded</option><option value="viable">Inspected · looks viable</option><option value="not_viable">Inspected · not enough / not worth pursuing</option></select></label>
+    <label class="field">Next action / what I promised<textarea id="nextAction" placeholder="Call homeowner / send photos / return for inspection"></textarea></label>
+    <label class="field">Follow-up / appointment<input id="due" type="datetime-local"></label>
+    <label class="field">Follow-up status<select id="followupState"><option value="open">Open</option><option value="done">Completed</option></select></label>
+    <div class="extra-actions"><button class="ghost save-detail" type="submit">Save details</button><a class="ghost" id="callLink" hidden>Call</a></div>
+  </form></dialog>
 
   <div id="log"></div>
   <div class="toast" id="toast"></div>
 
 <script>
 const KEY='doors-knock-log';
-const LABELS={talked:'Talked',comeback:'Come Back',noanswer:'No Answer',notint:'Not Interested'};
-let knocks=[];
-let filter='all';
-
+const SESSION_KEY='doors-knock-session-v2';
+const LABELS={talked:'Talked',comeback:'Come Back',noanswer:'No Answer',notint:'Not Interested',inspnot:'Inspected · Not Interested'};
+const STAGES={inspection_allowed:'Inspection allowed',inspection_scheduled:'Inspection scheduled',follow_up:'Follow up',thinking:'Needs time',ready_to_sign:'Ready to sign',signed:'Signed',not_moving_forward:'Not moving forward'};
+let knocks=[],filter='all',session=null,ready=false,loadError=false,editingId=null,undoState=null;
+let saveQueue=Promise.resolve();
 const $=id=>document.getElementById(id);
-const toastEl=$('toast');
-let toastTimer;
-function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),1800);}
-
-function todayKey(d){const x=new Date(d);return x.getFullYear()+'-'+(x.getMonth()+1)+'-'+x.getDate();}
-const NOWKEY=todayKey(Date.now());
-$('dateLine').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
-
 const inClaude=typeof window.storage!=='undefined'&&window.storage&&typeof window.storage.get==='function';
+async function readStore(key){if(inClaude){const r=await window.storage.get(key);return r&&r.value;}return localStorage.getItem(key);}
+async function writeStore(key,value){if(inClaude)await window.storage.set(key,value);else localStorage.setItem(key,value);}
+const toastEl=$('toast');let toastTimer;
+function toast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2200);}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function todayKey(d){const x=new Date(d);return x.getFullYear()+'-'+(x.getMonth()+1)+'-'+x.getDate();}
+function validRecords(a){return Array.isArray(a)&&a.every(k=>k&&typeof k==='object'&&!Array.isArray(k)&&typeof k.id==='string'&&typeof k.outcome==='string'&&Number.isFinite(k.ts)&&Number.isFinite(new Date(k.ts).getTime())&&(k.house==null||typeof k.house==='string')&&['lat','lng','acc'].every(f=>k[f]==null||Number.isFinite(k[f]))&&['name','phone','stage','inspection','nextAction','due','followupState','sessionId','storm','area'].every(f=>k[f]==null||typeof k[f]==='string'))&&new Set(a.map(k=>k.id)).size===a.length;}
+function setEnabled(on){document.querySelectorAll('.knock').forEach(b=>b.disabled=!on);$('clearBtn').disabled=!on;}
 async function load(){
-  try{
-    if(inClaude){
-      const r=await window.storage.get(KEY);
-      if(r&&r.value)knocks=JSON.parse(r.value);
-    }else{
-      const raw=localStorage.getItem(KEY);
-      if(raw)knocks=JSON.parse(raw);
-    }
-  }catch(e){knocks=[];}
-  render();
+ setEnabled(false);
+ try{const raw=await readStore(KEY);const data=raw?JSON.parse(raw):[];if(!validRecords(data))throw Error('Invalid log');knocks=data;ready=true;}
+ catch(e){loadError=true;$('statusNotice').textContent='Existing log could not be read. Logging is paused to protect it. Export Backup JSON before attempting recovery.';}
+ try{const raw=await readStore(SESSION_KEY);const s=raw?JSON.parse(raw):null;if(s&&typeof s.id==='string'&&typeof s.storm==='string'&&typeof s.area==='string')session=s;}catch(e){/* Log remains available even if session settings fail. */}
+ setEnabled(ready);syncSession();render();
 }
-async function save(){
-  try{
-    if(inClaude){await window.storage.set(KEY,JSON.stringify(knocks));}
-    else{localStorage.setItem(KEY,JSON.stringify(knocks));}
-  }catch(e){toast('Save failed — still in memory');}
+function save(){
+ if(!ready)return Promise.resolve(false);
+ const snapshot=JSON.stringify(knocks);
+ saveQueue=saveQueue.then(async()=>{try{await writeStore(KEY,snapshot);return true;}catch(e){$('statusNotice').textContent='Save failed — changes are only in memory. Use Backup JSON before closing.';toast('Save failed — back up before closing');return false;}});
+ return saveQueue;
 }
-
-function setGps(state,msg,pulse){
-  const bar=$('gpsBar');
-  bar.className='gpsbar'+(state?' '+state:'');
-  bar.querySelector('.dot').className='dot'+(pulse?' pulse':'');
-  $('gpsText').textContent=msg;
-}
-
+function checkpoint(){undoState=JSON.stringify(knocks);$('undoBtn').disabled=false;}
+function setGps(state,msg,pulse){const bar=$('gpsBar');bar.className='gpsbar'+(state?' '+state:'');bar.querySelector('.dot').className='dot'+(pulse?' pulse':'');$('gpsText').textContent=msg;}
 function addKnock(outcome){
-  const k={id:Date.now()+'-'+Math.random().toString(36).slice(2,6),
-    outcome, ts:Date.now(), lat:null,lng:null,acc:null,house:''};
-  knocks.unshift(k);
-  render(); save();
-  toast(LABELS[outcome]+' logged');
-  if(!navigator.geolocation){setGps('err','GPS not available on this device',false);return;}
-  setGps('','Locking GPS for this door…',true);
-  navigator.geolocation.getCurrentPosition(pos=>{
-    k.lat=+pos.coords.latitude.toFixed(6);
-    k.lng=+pos.coords.longitude.toFixed(6);
-    k.acc=Math.round(pos.coords.accuracy);
-    setGps('ok','Stamped ±'+k.acc+'m — GPS back off',false);
-    render(); save();
-  },err=>{
-    setGps('err','No GPS fix ('+err.message+') — knock saved without pin',false);
-  },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
+ if(!ready)return;
+ checkpoint();const k={id:Date.now()+'-'+Math.random().toString(36).slice(2,8),outcome,ts:Date.now(),lat:null,lng:null,acc:null,house:''};
+ if(session)Object.assign(k,{sessionId:session.id,storm:session.storm,area:session.area});
+ knocks.unshift(k);render();save();toast(LABELS[outcome]+' logged');
+ if(!navigator.geolocation){setGps('err','GPS not available on this device',false);return;}
+ setGps('','Locking GPS for this door…',true);
+ navigator.geolocation.getCurrentPosition(pos=>{
+ const live=knocks.find(x=>x.id===k.id);if(!live)return;
+ live.lat=+pos.coords.latitude.toFixed(6);live.lng=+pos.coords.longitude.toFixed(6);live.acc=Math.round(pos.coords.accuracy);
+ setGps('ok','Stamped ±'+live.acc+'m — GPS back off',false);render();save();
+ },err=>setGps('err','No GPS fix ('+err.message+') — knock saved without pin',false),{enableHighAccuracy:true,timeout:12000,maximumAge:0});
 }
-
 document.querySelectorAll('.knock').forEach(b=>b.addEventListener('click',()=>addKnock(b.dataset.outcome)));
-
-$('filters').addEventListener('click',e=>{
-  const c=e.target.closest('.chip'); if(!c)return;
-  filter=c.dataset.f;
-  document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));
-  render();
-});
-
+$('filters').addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c)return;filter=c.dataset.f;document.querySelectorAll('#filters .chip').forEach(x=>x.classList.toggle('on',x===c));render();});
 function accClass(a){return a==null?'':(a<=12?'tight':a>30?'loose':'');}
-
+function needsFollowup(k){return k.followupState!=='done'&&(k.outcome==='comeback'||!!k.nextAction||!!k.due||['inspection_allowed','inspection_scheduled','follow_up','thinking','ready_to_sign'].includes(k.stage));}
+function detailSummary(k){const parts=[];if(k.name)parts.push(k.name);if(STAGES[k.stage])parts.push(STAGES[k.stage]);if(k.inspection)parts.push(k.inspection==='viable'?'Inspected · looks viable':'Inspected · not viable');if(k.nextAction)parts.push(k.nextAction);if(k.due){const date=new Date(k.due);if(Number.isFinite(date.getTime()))parts.push((k.followupState==='done'?'Completed · ':date<Date.now()?'Overdue · ':'Due · ')+date.toLocaleString());}else if(needsFollowup(k))parts.push('Follow-up · no date set');return parts.join(' · ');}
 function render(){
-  $('dayCount').textContent=knocks.filter(k=>todayKey(k.ts)===NOWKEY).length;
-  let list=knocks;
-  if(filter==='today')list=knocks.filter(k=>todayKey(k.ts)===NOWKEY);
-  else if(filter!=='all')list=knocks.filter(k=>k.outcome===filter);
-  const log=$('log');
-  if(!list.length){log.innerHTML='<div class="empty">No knocks here yet. Hit a button at the door — GPS stamps automatically.</div>';return;}
-  log.innerHTML=list.map(k=>{
-    const t=new Date(k.ts);
-    const time=t.toLocaleDateString(undefined,{month:'numeric',day:'numeric'})+' '+t.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
-    const gps=k.lat!=null
-      ?'<span class="acc '+accClass(k.acc)+'">±'+k.acc+'m</span><a class="maplink" target="_blank" rel="noopener" href="https://maps.google.com/?q='+k.lat+','+k.lng+'">MAP ↗</a>'
-      :'<span class="acc">no pin</span>';
-    return '<div class="entry '+k.outcome+'">'
-      +'<div class="erow"><span class="etitle">'+LABELS[k.outcome]+'</span>'
-      +'<span class="etime">'+time+' <button class="del" data-id="'+k.id+'" aria-label="Delete">✕</button></span></div>'
-      +'<div class="emeta"><input class="house" data-id="'+k.id+'" placeholder="House # / note" value="'+(k.house||'').replace(/"/g,'&quot;')+'">'+gps+'</div>'
-      +'</div>';
-  }).join('');
-  log.querySelectorAll('.del').forEach(b=>b.addEventListener('click',async()=>{
-    knocks=knocks.filter(k=>k.id!==b.dataset.id);render();save();
-  }));
-  log.querySelectorAll('.house').forEach(inp=>inp.addEventListener('change',()=>{
-    const k=knocks.find(x=>x.id===inp.dataset.id);
-    if(k){k.house=inp.value;save();}
-  }));
+ const today=todayKey(Date.now());$('dateLine').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});$('dayCount').textContent=knocks.filter(k=>todayKey(k.ts)===today).length;
+ let list=knocks;if(filter==='today')list=knocks.filter(k=>todayKey(k.ts)===today);else if(filter==='followups')list=knocks.filter(needsFollowup).slice().sort((a,b)=>(Date.parse(a.due)||Infinity)-(Date.parse(b.due)||Infinity));else if(filter!=='all')list=knocks.filter(k=>k.outcome===filter);
+ const active=document.activeElement;const focus=active&&active.classList.contains('house')?{id:active.dataset.id,start:active.selectionStart,end:active.selectionEnd}:null;
+ const log=$('log');log.innerHTML=list.length?list.map(k=>{
+ const t=new Date(k.ts),time=t.toLocaleDateString(undefined,{month:'numeric',day:'numeric'})+' '+t.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+ const gps=k.lat!=null&&k.lng!=null?'<span class="acc '+accClass(k.acc)+'">±'+esc(k.acc)+'m</span><a class="maplink" target="_blank" rel="noopener" href="https://maps.google.com/?q='+encodeURIComponent(k.lat+','+k.lng)+'">MAP ↗</a>':'<span class="acc">no pin</span>';
+ return '<div class="entry '+(Object.hasOwn(LABELS,k.outcome)?esc(k.outcome):'')+'"><div class="erow"><span class="etitle">'+esc(LABELS[k.outcome]||k.outcome)+'</span><span class="etime">'+esc(time)+' <button class="del" data-id="'+esc(k.id)+'" aria-label="Delete">✕</button></span></div><div class="emeta"><input class="house" aria-label="House number or note" data-id="'+esc(k.id)+'" placeholder="House # / note" value="'+esc(k.house)+'">'+gps+'</div><div class="detail-summary">'+esc(detailSummary(k))+'</div><button class="ghost detail-button" data-id="'+esc(k.id)+'">Details / follow-up</button></div>';
+ }).join(''):'<div class="empty">'+(filter==='followups'?'No open follow-ups.':'No knocks here yet. Hit a button at the door — GPS stamps automatically.')+'</div>';
+ log.querySelectorAll('.del').forEach(b=>b.addEventListener('click',()=>{checkpoint();knocks=knocks.filter(k=>k.id!==b.dataset.id);render();save();toast('Deleted — Undo available in backup panel');}));
+ log.querySelectorAll('.house').forEach(inp=>inp.addEventListener('input',()=>{const k=knocks.find(x=>x.id===inp.dataset.id);if(k){k.house=inp.value;save();}}));
+ log.querySelectorAll('.detail-button').forEach(b=>b.addEventListener('click',()=>openDetail(b.dataset.id)));
+ if(focus){const inp=Array.from(log.querySelectorAll('.house')).find(x=>x.dataset.id===focus.id);if(inp){inp.focus({preventScroll:true});inp.setSelectionRange(focus.start,focus.end);}}
+ const run=session?knocks.filter(k=>k.sessionId===session.id):knocks.filter(k=>todayKey(k.ts)===today);
+ const conversations=run.filter(k=>['talked','comeback','inspnot'].includes(k.outcome)).length;
+ $('progress').textContent=(session?'Session':'Today')+': '+run.length+' doors'+(session&&session.target?' / '+session.target+' target':'')+' · '+conversations+' conversations* · '+run.filter(k=>k.inspection||k.outcome==='inspnot').length+' inspections · '+run.filter(k=>k.stage==='signed').length+' signed. *Talked, come back, or inspected; other conversations may be unrecorded.';
 }
-
-$('csvBtn').addEventListener('click',()=>{
-  const rows=[['datetime','outcome','house_note','lat','lng','accuracy_m']];
-  knocks.slice().reverse().forEach(k=>rows.push([
-    new Date(k.ts).toISOString(),LABELS[k.outcome],
-    '"'+(k.house||'').replace(/"/g,'""')+'"',
-    k.lat??'',k.lng??'',k.acc??''
-  ]));
-  const csv=rows.map(r=>r.join(',')).join('\n');
-  navigator.clipboard.writeText(csv).then(()=>toast('CSV copied — paste into Sheets/Obsidian'))
-    .catch(()=>toast('Copy blocked — long-press to select'));
-});
-
-$('clearBtn').addEventListener('click',async()=>{
-  if(!confirm('Delete ALL knocks? This cannot be undone.'))return;
-  knocks=[];render();save();toast('Log cleared');
-});
-
+const fields={contactName:'name',phone:'phone',stage:'stage',inspection:'inspection',nextAction:'nextAction',due:'due',followupState:'followupState'};
+function openDetail(id){const k=knocks.find(x=>x.id===id);if(!k)return;editingId=id;for(const [field,key]of Object.entries(fields))$(field).value=k[key]||(key==='followupState'?'open':'');$('detailTitle').textContent=k.house||'Visit details';const tel=String(k.phone||'').replace(/[^+\d*#,;]/g,'');$('callLink').hidden=!tel;$('callLink').href='tel:'+tel;$('detailDialog').showModal();}
+$('closeDetail').addEventListener('click',()=>$('detailDialog').close());
+$('detailForm').addEventListener('submit',async e=>{e.preventDefault();const k=knocks.find(x=>x.id===editingId);if(!k){$('detailDialog').close();return;}checkpoint();for(const [field,key]of Object.entries(fields))k[key]=$(field).value.trim();render();const ok=await save();$('detailDialog').close();if(ok)toast('Details saved — same visit');});
+function syncSession(){$('sessionSummary').textContent=session?'Session: '+[session.storm,session.area].filter(Boolean).join(' · '):'Storm / session & backup';$('storm').value=session?.storm||'';$('area').value=session?.area||'';$('target').value=session?.target||'';}
+async function saveSession(){try{await writeStore(SESSION_KEY,JSON.stringify(session));syncSession();render();}catch(e){$('statusNotice').textContent='Session could not be saved. Door log is still available.';}}
+$('startSession').addEventListener('click',()=>{session={id:Date.now()+'-'+Math.random().toString(36).slice(2,8),storm:$('storm').value.trim(),area:$('area').value.trim(),target:Math.max(0,Math.floor(Number($('target').value)||0)),started:Date.now()};saveSession();toast('New session started');});
+$('endSession').addEventListener('click',()=>{session=null;saveSession();});
+function download(text,name,type){const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);}
+async function backup(){let data;if(loadError)data={format:'doors-recovery-raw',raw:await readStore(KEY)};else data={format:'doors-backup',version:2,exportedAt:new Date().toISOString(),knocks,session};download(JSON.stringify(data,null,2),'doors-backup-'+new Date().toISOString().slice(0,10)+'.json','application/json');}
+$('backupBtn').addEventListener('click',()=>backup().catch(()=>toast('Backup failed — keep this page open')));
+$('restoreBtn').addEventListener('click',()=>$('importFile').click());
+async function importBackup(text){if(!ready)throw Error('Existing log unreadable — recovery required before import');const data=JSON.parse(text);const incoming=Array.isArray(data)?data:data.format==='doors-backup'?data.knocks:null;if(!validRecords(incoming))throw Error('Invalid backup: no records changed');const ids=new Set(knocks.map(k=>k.id));const added=incoming.filter(k=>!ids.has(k.id));if(!added.length)return 0;if(!confirm('Add '+added.length+' records? Existing records will stay unchanged.'))return 0;checkpoint();knocks=knocks.concat(added).sort((a,b)=>b.ts-a.ts);render();await save();return added.length;}
+$('importFile').addEventListener('change',async e=>{try{const f=e.target.files[0];if(f){if(f.size>20*1024*1024)throw Error('Backup exceeds 20 MB');const n=await importBackup(await f.text());toast(n+' records added');}}catch(err){toast(err.message);}finally{e.target.value='';}});
+function csvText(extended=false){const rows=[['datetime','outcome','house_note','lat','lng','accuracy_m']];const extra=['record_id','session_id','storm','area','name','phone','stage','inspection','next_action','due','followup_status'];if(extended)rows[0].push(...extra);knocks.slice().reverse().forEach(k=>{const row=[new Date(k.ts).toISOString(),LABELS[k.outcome]||k.outcome,'"'+(k.house||'').replace(/"/g,'""')+'"',k.lat??'',k.lng??'',k.acc??''];if(extended)row.push(...[k.id,k.sessionId,k.storm,k.area,k.name,k.phone,k.stage,k.inspection,k.nextAction,k.due,k.followupState].map(v=>'"'+String(v??'').replace(/"/g,'""')+'"'));rows.push(row);});return rows.map(r=>r.join(',')).join('\n');}
+$('csvBtn').addEventListener('click',async()=>{const csv=csvText();try{await navigator.clipboard.writeText(csv);toast('CSV copied — paste into Sheets/Obsidian');}catch(e){download(csv,'doors.csv','text/csv');toast('Copy unavailable — CSV download started');}});
+$('extendedCsvBtn').addEventListener('click',()=>download(csvText(true),'doors-detailed.csv','text/csv'));
+$('undoBtn').addEventListener('click',()=>{if(!undoState||!ready)return;knocks=JSON.parse(undoState);undoState=null;$('undoBtn').disabled=true;render();save();toast('Last action undone');});
+$('clearBtn').addEventListener('click',async()=>{if(!ready||!confirm('Back up, then delete ALL knocks? Undo is available until the next action or reload.'))return;try{await backup();}catch(e){toast('Backup failed — log not cleared');return;}checkpoint();knocks=[];render();save();toast('Log cleared — Undo available in backup panel');});
+window.addEventListener('pageshow',()=>{if(ready)render();});
 load();
+
 </script>
 </body>
 </html>
