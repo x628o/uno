@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>PA Exam Drill</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -18,7 +25,7 @@
     max-width:560px;margin:0 auto;
     padding-left:max(16px,env(safe-area-inset-left,0px));
     padding-right:max(16px,env(safe-area-inset-right,0px));
-    padding-block:16px calc(110px + env(safe-area-inset-bottom,0px));
+    padding-block:calc(16px + env(safe-area-inset-top,0px)) calc(110px + env(safe-area-inset-bottom,0px));
   }
   header{display:flex;justify-content:space-between;align-items:baseline}
   h1{font-family:var(--display);font-size:32px;letter-spacing:1px}
@@ -50,6 +57,7 @@
   .opt.faded{opacity:.4}
   .exp{background:var(--asphalt);border-left:5px solid var(--gold);border-radius:10px;padding:14px 16px;font-size:17px;line-height:1.5;margin-top:14px}
   .exp.ok{border-left-color:var(--right)} .exp.bad{border-left-color:var(--wrong)}
+  .exp{scroll-margin-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
   .exp .cite{color:var(--dim);font-size:14px;display:block;margin-top:8px;letter-spacing:.5px}
 
   .nextbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:linear-gradient(transparent,var(--asphalt) 30%);
@@ -66,6 +74,8 @@
   .ghost.armed{border-color:var(--wrong);color:var(--wrong)}
   @media (prefers-reduced-motion:no-preference){.opt,.chip{transition:background .12s,border-color .12s}}
 </style>
+</head>
+<body>
 
 <header><h1>DRILL<span>.</span></h1><div class="score" id="streak"></div></header>
 <div class="sub">Illinois Public Adjuster — IL-PubAdj17</div>
@@ -366,3 +376,6 @@ el.reset.addEventListener('click',()=>{
 
 load();
 </script>
+</body>
+</html>
+
