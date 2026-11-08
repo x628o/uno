@@ -1,54 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>DRILL — IL PA Exam</title>
+<title>PA Exam Drill</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+  /* Layout: one-column phone drill card, fixed NEXT bar at the thumb zone. Single dark look by choice. */
   :root{
-    --asphalt:#121315;--slate:#1d1f23;--line:#2c2f35;--chalk:#f2f0eb;--dim:#8b8e96;
-    --gold:#ffd23f;--right:#3ddc84;--wrong:#ff5a52;--blue:#5aa7ff;
+    --asphalt:#121315;--slate:#1d1f23;--line:#2f333a;--chalk:#f2f0eb;--dim:#9a9ea7;
+    --gold:#ffd23f;--right:#3ddc84;--wrong:#ff6b63;--blue:#6db2ff;
+    --display:'Archivo Black','Arial Black',system-ui,sans-serif;
+    --body:'Archivo',system-ui,-apple-system,sans-serif;
+    color-scheme:dark;
+    -webkit-text-size-adjust:100%;text-size-adjust:100%;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  body{background:var(--asphalt);color:var(--chalk);font-family:'Archivo',system-ui,sans-serif;max-width:520px;margin:0 auto;padding:14px 14px 40px}
+  html{background:var(--asphalt)}
+  body{
+    background:var(--asphalt);color:var(--chalk);font-family:var(--body);font-size:17px;
+    max-width:560px;margin:0 auto;
+    padding-left:max(16px,env(safe-area-inset-left,0px));
+    padding-right:max(16px,env(safe-area-inset-right,0px));
+    padding-block:16px calc(110px + env(safe-area-inset-bottom,0px));
+  }
   header{display:flex;justify-content:space-between;align-items:baseline}
-  h1{font-family:'Archivo Black',sans-serif;font-size:26px;letter-spacing:1px}
+  h1{font-family:var(--display);font-size:32px;letter-spacing:1px}
   h1 span{color:var(--gold)}
-  .score{font-family:'Archivo Black',sans-serif;font-size:15px;color:var(--gold)}
-  .sub{color:var(--dim);font-size:12px;margin:2px 0 12px;text-transform:uppercase;letter-spacing:1.5px}
-  .filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-  .chip{background:var(--slate);border:1px solid var(--line);color:var(--dim);border-radius:99px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Archivo',sans-serif}
+  .score{font-family:var(--display);font-size:19px;color:var(--gold)}
+  .sub{color:var(--dim);font-size:13px;margin:4px 0 16px;text-transform:uppercase;letter-spacing:1.5px}
+
+  .statsbar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+  .stat{background:var(--slate);border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center}
+  .stat b{display:block;font-family:var(--display);font-size:24px;font-variant-numeric:tabular-nums}
+  .stat span{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+  .stat b.g{color:var(--right)} .stat b.r{color:var(--wrong)}
+
+  .filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .chip{background:var(--slate);border:1px solid var(--line);color:var(--dim);border-radius:99px;padding:0 16px;min-height:42px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--body)}
   .chip.on{color:var(--asphalt);background:var(--gold);border-color:var(--gold)}
-  .qcard{background:var(--slate);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
-  .qmeta{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
+
+  .qcard{background:var(--slate);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
+  .qmeta{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px}
   .qmeta .seen{color:var(--blue)}
-  .qtext{font-size:16px;font-weight:600;line-height:1.45;margin-bottom:14px}
-  .opt{width:100%;text-align:left;background:var(--asphalt);border:1px solid var(--line);color:var(--chalk);border-radius:10px;padding:13px 14px;font-size:14px;font-family:'Archivo',sans-serif;font-weight:600;margin-bottom:8px;cursor:pointer;line-height:1.35}
-  .opt:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .qtext{font-size:21px;font-weight:700;line-height:1.4;margin-bottom:18px;text-wrap:pretty}
+  #opts{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;gap:12px;width:100%;text-align:left;background:var(--asphalt);border:1.5px solid var(--line);color:var(--chalk);border-radius:12px;padding:16px;min-height:58px;font-size:18px;font-family:var(--body);font-weight:600;cursor:pointer;line-height:1.35}
+  .opt .ltr{color:var(--dim);font-weight:700;flex:none}
+  .opt:focus-visible,.chip:focus-visible,.next:focus-visible,.ghost:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   .opt.right{background:rgba(61,220,132,.15);border-color:var(--right);color:var(--right)}
-  .opt.wrong{background:rgba(255,90,82,.12);border-color:var(--wrong);color:var(--wrong)}
+  .opt.right .ltr,.opt.wrong .ltr{color:inherit}
+  .opt.wrong{background:rgba(255,107,99,.13);border-color:var(--wrong);color:var(--wrong)}
   .opt.faded{opacity:.4}
-  .exp{display:none;background:var(--asphalt);border-left:4px solid var(--gold);border-radius:8px;padding:11px 13px;font-size:13px;line-height:1.5;color:var(--chalk);margin-top:4px}
-  .exp .cite{color:var(--dim);font-size:11px;display:block;margin-top:5px;letter-spacing:.5px}
-  .next{display:none;width:100%;border:none;border-radius:12px;padding:16px;font-family:'Archivo Black',sans-serif;font-size:16px;letter-spacing:1px;background:var(--gold);color:var(--asphalt);cursor:pointer;margin-top:10px}
-  .statsbar{display:flex;gap:8px;margin-bottom:12px}
-  .stat{flex:1;background:var(--slate);border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:center}
-  .stat b{display:block;font-family:'Archivo Black',sans-serif;font-size:17px}
-  .stat span{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
-  .stat b.g{color:var(--right)} .stat b.y{color:var(--gold)} .stat b.r{color:var(--wrong)}
-  .mast{margin-top:14px}
-  .mrow{margin-bottom:9px}
-  .mlabel{display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-bottom:3px;text-transform:uppercase;letter-spacing:1px}
-  .mtrack{height:7px;background:var(--slate);border-radius:99px;overflow:hidden}
-  .mfill{height:100%;background:var(--gold);border-radius:99px;width:0%}
-  .ghost{background:none;border:1px solid var(--line);color:var(--dim);border-radius:7px;padding:6px 10px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:'Archivo',sans-serif;text-transform:uppercase}
-  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
-  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--chalk);color:var(--asphalt);font-weight:700;font-size:13px;padding:9px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
-  .toast.show{opacity:1}
+  .exp{background:var(--asphalt);border-left:5px solid var(--gold);border-radius:10px;padding:14px 16px;font-size:17px;line-height:1.5;margin-top:14px}
+  .exp.ok{border-left-color:var(--right)} .exp.bad{border-left-color:var(--wrong)}
+  .exp .cite{color:var(--dim);font-size:14px;display:block;margin-top:8px;letter-spacing:.5px}
+
+  .nextbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:linear-gradient(transparent,var(--asphalt) 30%);
+    padding:24px max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+  .next{display:block;width:100%;max-width:528px;margin:0 auto;border:none;border-radius:14px;min-height:62px;font-family:var(--display);font-size:20px;letter-spacing:1px;background:var(--gold);color:var(--asphalt);cursor:pointer}
+
+  .mast{display:flex;flex-direction:column;gap:12px;margin-top:4px}
+  .mlabel{display:flex;justify-content:space-between;font-size:14px;color:var(--dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px;font-variant-numeric:tabular-nums}
+  .mtrack{height:9px;background:var(--slate);border-radius:99px;overflow:hidden}
+  .mfill{height:100%;background:var(--gold);border-radius:99px}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:20px}
+  .foot .sub{margin:0}
+  .ghost{background:none;border:1px solid var(--line);color:var(--dim);border-radius:9px;padding:0 14px;min-height:42px;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:var(--body);text-transform:uppercase}
+  .ghost.armed{border-color:var(--wrong);color:var(--wrong)}
+  @media (prefers-reduced-motion:no-preference){.opt,.chip{transition:background .12s,border-color .12s}}
 </style>
-</head>
-<body>
+
 <header><h1>DRILL<span>.</span></h1><div class="score" id="streak"></div></header>
 <div class="sub">Illinois Public Adjuster — IL-PubAdj17</div>
 
@@ -71,20 +89,20 @@
   <div class="qmeta"><span id="qCat"></span><span class="seen" id="qSeen"></span></div>
   <div class="qtext" id="qText"></div>
   <div id="opts"></div>
-  <div class="exp" id="exp"></div>
-  <button class="next" id="nextBtn">NEXT →</button>
+  <div class="exp" id="exp" hidden></div>
 </div>
 
 <div class="mast" id="mastery"></div>
 <div class="foot">
-  <span class="sub" style="margin:0">Bank: <span id="bankN"></span> questions</span>
+  <span class="sub">Bank: <span id="bankN"></span> questions</span>
   <button class="ghost" id="resetBtn">Reset Progress</button>
 </div>
-<div class="toast" id="toast"></div>
+
+<div class="nextbar" id="nextBar" hidden><button class="next" id="nextBtn">NEXT →</button></div>
 
 <script>
-// Question bank — derived from the verified Illinois PA study guide (215 ILCS 5/1501-1615, 50 Ill. Admin. Code 919 & 3118).
-// cat: law=IL statutes/rules, claims=carrier conduct/timelines, concepts=insurance concepts, product=policy/product knowledge
+// Question bank — derived from the Illinois PA study guide (215 ILCS 5/1501-1615, 50 Ill. Admin. Code 919 & 3118).
+// c: law=IL statutes/rules, claims=carrier conduct/timelines, concepts=insurance concepts, product=policy/product knowledge
 const Q=[
 {c:"law",q:"Minimum surety bond or irrevocable letter of credit for an Illinois PA?",o:["$10,000","$20,000","$50,000","$100,000"],a:2,e:"$50,000 minimum financial responsibility.",x:"215 ILCS 5/1560(a)"},
 {c:"law",q:"Resident PA license fee in Illinois?",o:["$92 annually","$250 every 2 years","$500 every 2 years","$50 annually"],a:1,e:"Resident: $250 biennially. Nonresident: $500.",x:"§ 1563(1)"},
@@ -96,7 +114,7 @@ const Q=[
 {c:"law",q:"Minimum age for an Illinois PA license?",o:["16","18","21","25"],a:1,e:"18 years minimum.",x:"§ 1525(b)(1)"},
 {c:"law",q:"A lapsed license may be reinstated within 12 months by paying:",o:["The standard renewal fee","Double the unpaid renewal fee","A $1,000 penalty","Nothing — retake the exam"],a:1,e:"Within 12 months, penalty is double the unpaid renewal fee.",x:"§ 1545(e)"},
 {c:"law",q:"The insured may rescind a PA contract within:",o:["3 days of signing","5 business days after signing","5 business days after the insurer receives the contract copy","10 calendar days of loss"],a:2,e:"Clock starts when the INSURER receives the copy — not at signing.",x:"§ 1575(j)"},
-{c:"law",q:"Valid methods for an insured to cancel a PA contract include all EXCEPT:",o:["Certified/registered mail","Personal service","Email","Text message"],a:3,e:"Certified mail, personal service, or email. Text is not listed.",x:"§ 1575(j)"},
+{c:"law",q:"Valid methods for an insured to cancel a PA contract include all EXCEPT:",o:["Certified/registered mail","Personal service","Email","Text message"],a:3,e:"Certified mail, personal service, or email. Text is not listed.",x:"§ 1575(j)",fix:1},
 {c:"law",q:"After execution, the PA must send the insurer an exact contract copy by email within:",o:["24 hours","3 business days","5 business days","10 business days"],a:2,e:"5 business days of execution.",x:"§ 1575(j)"},
 {c:"law",q:"If the insured rescinds, the PA must return anything of value within:",o:["5 business days","10 business days","15 business days","30 days"],a:2,e:"15 business days.",x:"§ 1575(j)"},
 {c:"law",q:"If the insurer pays or commits in writing to policy limits within 5 business days of the loss being reported, the PA may collect:",o:["The full contracted percentage","Half the contracted percentage","Only reasonable hourly compensation for services rendered","Nothing at all"],a:2,e:"No percentage commission — hourly only, and PA must tell the insured recovery may not increase.",x:"§ 1575(c)"},
@@ -156,7 +174,7 @@ const Q=[
 {c:"claims",q:"With every denial or delay explanation, the carrier must include:",o:["A check for partial payment","The Notice of Availability of the Department of Insurance","An appraisal demand","Attorney contact info"],a:1,e:"The DOI availability notice accompanies denials and delay explanations.",x:"50 IAC 919"},
 {c:"concepts",q:"Under indemnity, a $50,000 loss on a property insured for $75,000 pays:",o:["$75,000","$50,000","$25,000","$62,500"],a:1,e:"Lesser of actual loss or policy limit — no better, no worse than pre-loss.",x:"Principle of indemnity"},
 {c:"concepts",q:"Which are EXCEPTIONS to strict indemnity?",o:["Subrogation and contribution","Replacement cost coverage and valued policies","Deductibles","Named perils"],a:1,e:"RCV and valued policies can pay more than strict pre-loss value.",x:"Indemnity"},
-{c:"concepts",q:"For PROPERTY insurance, insurable interest must exist:",o:["At policy inception","At time of loss","At both","At renewal"],a:1,e:"At time of loss. Life insurance: at inception. Sources: ownership, secured creditor, lease, legal liability.",x:"Insurable interest"},
+{c:"concepts",q:"For PROPERTY insurance, insurable interest must exist:",o:["At policy inception","At time of loss","At both","At renewal"],a:1,e:"At time of loss. Life insurance: at inception. Sources: ownership, secured creditor, lease, legal liability.",x:"Insurable interest",fix:1},
 {c:"concepts",q:"The insurer's right to recover from a negligent third party after paying the insured:",o:["Contribution","Indemnification","Subrogation","Estoppel"],a:2,e:"Subrogation — insurer steps into the insured's shoes. Insured must be made whole first; doesn't apply to life insurance.",x:"Subrogation"},
 {c:"concepts",q:"An insured signs a release with the negligent party before the insurer recovers. The insured has:",o:["Exercised their rights","Impaired the insurer's subrogation rights","Triggered estoppel","Waived the deductible"],a:1,e:"The insured cannot impair subrogation — this can jeopardize the claim.",x:"Subrogation"},
 {c:"concepts",q:"An insurer continues investigating after discovering a policy violation. This may constitute:",o:["Estoppel","Waiver","Concealment","Rebating"],a:1,e:"Waiver = voluntary relinquishment of a known right. Estoppel is court-imposed after reasonable reliance.",x:"Waiver vs estoppel"},
@@ -174,7 +192,7 @@ const Q=[
 {c:"product",q:"The four components of a property policy:",o:["Application, binder, rider, endorsement","Declarations, insuring agreement, conditions, exclusions","Premium, limit, deductible, term","Offer, acceptance, consideration, legality"],a:1,e:"Dec page (who/what/limits), insuring agreement (the promise), conditions (duties), exclusions.",x:"Policy structure"},
 {c:"product",q:"Under NAMED perils coverage, the burden of proving cause of loss falls on:",o:["The insurer","The insured","The adjuster","Neither"],a:1,e:"Named perils: insured proves a listed peril caused it. Open perils: insurer must prove an exclusion.",x:"Named vs open perils"},
 {c:"product",q:"Mysterious ceiling stain, HO-3, no known cause. Coverage for the dwelling turns on:",o:["The insured proving a covered peril","The insurer proving an excluded peril caused it","Who filed proof of loss","Automatic denial"],a:1,e:"HO-3 dwelling = open perils → insurer bears the exclusion burden. Can't prove it? Covered.",x:"HO-3 burden of proof"},
-{c:"product",q:"HO-3 covers the dwelling on what basis?",o:["Named perils, ACV","Named perils, RCV","Open perils, ACV","Open perils, RCV"],a:3,e:"Dwelling: open perils at RCV. Personal property: named perils, typically ACV.",x:"HO-3"},
+{c:"product",q:"HO-3 covers the dwelling on what basis?",o:["Named perils, ACV","Named perils, RCV","Open perils, ACV","Open perils, RCV"],a:3,e:"Dwelling: open perils at RCV. Personal property: named perils, typically ACV.",x:"HO-3",fix:1},
 {c:"product",q:"Which form covers BOTH dwelling and contents on open perils?",o:["HO-2","HO-3","HO-5","HO-8"],a:2,e:"HO-5 Comprehensive — the broadest standard form.",x:"HO forms"},
 {c:"product",q:"HO-4 is designed for:",o:["Condo owners","Renters — personal property only","Older homes","Mobile homes"],a:1,e:"HO-4 renters (named perils, contents). HO-6 condo. HO-7 mobile home. HO-8 older home (ACV).",x:"HO forms"},
 {c:"product",q:"HO-8 exists for homes where:",o:["Flood risk is high","Replacement cost exceeds market value","The owner rents rooms","Construction is fire-resistive"],a:1,e:"Older homes — ACV basis, limited named perils.",x:"HO-8"},
@@ -183,132 +201,168 @@ const Q=[
 {c:"product",q:"The appraisal clause resolves disputes over:",o:["Coverage questions","The amount of loss","Bad faith","Premiums"],a:1,e:"Amount only. Each side picks an appraiser, they pick an umpire; any two of three bind. Each pays own appraiser; umpire split.",x:"Appraisal clause"},
 {c:"product",q:"Under a mortgage clause, the lender's coverage:",o:["Falls with the homeowner's violations","Is independent — not invalidated by the homeowner's acts","Requires a separate policy","Covers contents"],a:1,e:"Mortgagee protected independently; insurer must give the lender separate cancellation notice.",x:"Mortgage clause"},
 {c:"product",q:"Sworn proof of loss under the Standard Fire Policy is typically due within:",o:["30 days","60 days","90 days","6 months"],a:1,e:"60 days. The 1943 NY SFP also set the 12-month suit limitation and appraisal procedure.",x:"Standard Fire Policy"},
-{c:"product",q:"The 1943 New York Standard Fire Policy established all EXCEPT:",o:["60-day proof of loss","12-month suit limitation","The appraisal procedure","Flood coverage"],a:3,e:"Flood is excluded from standard policies — NFIP is a separate federal program.",x:"SFP / NFIP"},
+{c:"product",q:"The 1943 New York Standard Fire Policy established all EXCEPT:",o:["60-day proof of loss","12-month suit limitation","The appraisal procedure","Flood coverage"],a:3,e:"Flood is excluded from standard policies — NFIP is a separate federal program.",x:"SFP / NFIP",fix:1},
 {c:"product",q:"A flood destroys a home with a standard HO-3 and no flood coverage. The PA should:",o:["Argue open perils covers it","File it as wind damage","Explain the exclusion and point the insured to NFIP/FEMA","Refer to a bad-faith attorney"],a:2,e:"Filing as wind = fraud. Honesty is the fiduciary duty; NFIP is the flood path.",x:"Fiduciary + NFIP"},
 {c:"product",q:"The insurer broadens coverage with no premium increase. Existing policies:",o:["Must be rewritten","Automatically get the broader coverage via the liberalization clause","Stay unchanged until renewal","Need an endorsement"],a:1,e:"Liberalization clause applies the improvement automatically.",x:"Liberalization"},
 {c:"product",q:"Which is a standard property policy exclusion?",o:["Hail","Lightning","Earthquake","Windstorm"],a:2,e:"Standard exclusions: flood, earthquake, war, intentional acts, wear and tear, nuclear, government action.",x:"Exclusions"},
-{c:"product",q:"Duties after loss include all EXCEPT:",o:["Prompt notice and protecting property","Preparing an inventory and showing the damage","Submitting to EUO and producing records","Abandoning the property to the insurer"],a:3,e:"Abandonment is never a duty — it's prohibited.",x:"Duties after loss"},
+{c:"product",q:"Duties after loss include all EXCEPT:",o:["Prompt notice and protecting property","Preparing an inventory and showing the damage","Submitting to EUO and producing records","Abandoning the property to the insurer"],a:3,e:"Abandonment is never a duty — it's prohibited.",x:"Duties after loss",fix:1},
 {c:"law",q:"Exam structure: questions / minutes / passing score?",o:["100 / 120 / 75 raw","100 / 165 / 70 scaled","150 / 180 / 70%","80 / 90 / 65 scaled"],a:1,e:"100 scored questions, 165 minutes, scaled 70 (NOT a raw percentage). Test centers only.",x:"IL-PubAdj17"},
 {c:"law",q:"Retake waiting periods after failing?",o:["None","7 days after first fail; 30 days after second+","30 days always","14 / 60 days"],a:1,e:"7 days after the first fail, 30 days after second or subsequent fails.",x:"Pearson VUE"},
-{c:"law",q:"Illinois statute questions make up how much of the exam?",o:["10","25","35","50"],a:1,e:"25 questions IL law, 25 terms/concepts, 35 product knowledge, 10 estimating, 5 policy provisions.",x:"Content outline"}
+{c:"law",q:"Illinois statute questions make up how much of the exam?",o:["10","25","35","50"],a:1,e:"25 questions IL law, 25 terms/concepts, 35 product knowledge, 10 estimating, 5 policy provisions.",x:"Content outline",fix:1}
 ];
+// fix:1 = options are a fixed set (e.g. "all EXCEPT", "At both") or ordered — keep their order instead of shuffling.
 
 const KEY='pa-drill-stats';
 const CATS={law:"IL Law",claims:"Carrier Rules",concepts:"Concepts",product:"Policies"};
-const inClaude=typeof window.storage!=='undefined'&&window.storage&&typeof window.storage.get==='function';
-let S={q:{},today:{d:'',n:0,c:0},streak:0};
-let filter='all',cur=-1,answered=false;
-
+const hasClaudeStore=!!(window.storage&&typeof window.storage.get==='function');
 const $=id=>document.getElementById(id);
-let toastTimer;
-function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),1800);}
-function dkey(){const x=new Date();return x.getFullYear()+'-'+(x.getMonth()+1)+'-'+x.getDate();}
+const el={qCat:$('qCat'),qSeen:$('qSeen'),qText:$('qText'),opts:$('opts'),exp:$('exp'),nextBar:$('nextBar'),
+  today:$('sToday'),acc:$('sAcc'),weak:$('sWeak'),streak:$('streak'),mastery:$('mastery'),reset:$('resetBtn')};
+
+let S=fresh();
+let filter='all',cur=-1,answered=false,order=[],recent=[];
+
+function fresh(){return {q:{},today:{d:dkey(),n:0,c:0},streak:0};}
+function dkey(){const x=new Date();return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
+function stat(i){return S.q[i]||{c:0,w:0,s:0};}
+const isWeak=t=>t.w>0&&t.s<2;
 
 async function load(){
   try{
     let raw=null;
-    if(inClaude){const r=await window.storage.get(KEY);raw=r&&r.value;}
-    else{raw=localStorage.getItem(KEY);}
-    if(raw)S=JSON.parse(raw);
+    if(hasClaudeStore){const r=await window.storage.get(KEY);raw=r&&r.value;}
+    if(!raw)raw=localStorage.getItem(KEY);
+    if(raw){const p=JSON.parse(raw);S={...fresh(),...p,today:{...fresh().today,...(p.today||{})},q:p.q||{}};}
   }catch(e){}
+  // older saves used an unpadded date key — accept it so today's count survives the update
+  const legacy=(()=>{const x=new Date();return x.getFullYear()+'-'+(x.getMonth()+1)+'-'+x.getDate();})();
+  if(S.today.d===legacy)S.today.d=dkey();
   if(S.today.d!==dkey())S.today={d:dkey(),n:0,c:0};
   $('bankN').textContent=Q.length;
   next();renderStats();
 }
-async function save(){
-  try{
-    if(inClaude)await window.storage.set(KEY,JSON.stringify(S));
-    else localStorage.setItem(KEY,JSON.stringify(S));
-  }catch(e){}
+let saveTimer;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    const json=JSON.stringify(S);
+    try{localStorage.setItem(KEY,json);}catch(e){}
+    try{if(hasClaudeStore)await window.storage.set(KEY,json);}catch(e){}
+  },150);
 }
 
-function stat(i){return S.q[i]||{c:0,w:0,s:0};}
 function weight(i){
   const t=stat(i);
-  if(t.c+t.w===0)return 3;        // unseen
-  if(t.s<0)return 4+Math.min(-t.s,3); // wrong streak — hammer it
-  if(t.s>=3)return .3;            // mastered
+  if(t.c+t.w===0)return 3;              // unseen
+  if(t.s<0)return 4+Math.min(-t.s,3);   // wrong streak — hammer it
+  if(t.s>=3)return .3;                  // mastered
   if(t.s>=1)return 1;
   return 2;
 }
-function pool(){
-  let idx=Q.map((q,i)=>i);
-  if(filter==='weak')idx=idx.filter(i=>{const t=stat(i);return t.w>0&&t.s<2;});
-  else if(filter!=='all')idx=idx.filter(i=>Q[i].c===filter);
-  return idx.filter(i=>i!==cur).length?idx.filter(i=>i!==cur):idx;
-}
 function pick(){
-  const p=pool();
+  let p=[];
+  for(let i=0;i<Q.length;i++){
+    if(filter==='weak'?!isWeak(stat(i)):(filter!=='all'&&Q[i].c!==filter))continue;
+    p.push(i);
+  }
   if(!p.length)return -1;
-  const ws=p.map(weight);const tot=ws.reduce((a,b)=>a+b,0);
-  let r=Math.random()*tot;
-  for(let j=0;j<p.length;j++){r-=ws[j];if(r<=0)return p[j];}
-  return p[p.length-1];
+  // avoid the last few questions so you don't see repeats back-to-back
+  const avoid=Math.min(recent.length,p.length-1);
+  const block=new Set(recent.slice(-avoid));
+  const pp=p.filter(i=>!block.has(i));
+  const ws=pp.map(weight);let r=Math.random()*ws.reduce((a,b)=>a+b,0);
+  for(let j=0;j<pp.length;j++){r-=ws[j];if(r<=0)return pp[j];}
+  return pp[pp.length-1];
+}
+function shuffled(n,keep){
+  const a=[...Array(n).keys()];
+  if(keep)return a;
+  for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
 }
 
 function next(){
   cur=pick();answered=false;
-  $('exp').style.display='none';$('nextBtn').style.display='none';
-  if(cur<0){$('qText').textContent='No weak spots here — clean slate. Switch filters and keep drilling.';$('opts').innerHTML='';$('qCat').textContent='';$('qSeen').textContent='';return;}
-  const q=Q[cur],t=stat(cur);
-  $('qCat').textContent=CATS[q.c];
-  $('qSeen').textContent=t.c+t.w?('seen '+(t.c+t.w)+'× · '+(t.w?t.w+' missed':'clean')):'NEW';
-  $('qText').textContent=q.q;
-  $('opts').innerHTML=q.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+String.fromCharCode(65+j)+'. '+o+'</button>').join('');
-  document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>answer(+b.dataset.j)));
+  el.exp.hidden=true;el.nextBar.hidden=true;
+  if(cur<0){
+    el.qText.textContent='No weak spots here. Switch filters and keep drilling.';
+    el.opts.replaceChildren();el.qCat.textContent='';el.qSeen.textContent='';return;
+  }
+  recent.push(cur);if(recent.length>6)recent.shift();
+  const q=Q[cur],t=stat(cur),seen=t.c+t.w;
+  el.qCat.textContent=CATS[q.c];
+  el.qSeen.textContent=seen?('seen '+seen+'× · '+(t.w?t.w+' missed':'clean')):'NEW';
+  el.qText.textContent=q.q;
+  order=shuffled(q.o.length,q.fix);
+  const frag=document.createDocumentFragment();
+  order.forEach((orig,pos)=>{
+    const b=document.createElement('button');
+    b.className='opt';b.dataset.j=orig;
+    const l=document.createElement('span');l.className='ltr';l.textContent=String.fromCharCode(65+pos)+'.';
+    const s=document.createElement('span');s.textContent=q.o[orig];
+    b.append(l,s);frag.append(b);
+  });
+  el.opts.replaceChildren(frag);
+  window.scrollTo({top:0,behavior:'instant'});
 }
 
 function answer(j){
-  if(answered)return;answered=true;
-  const q=Q[cur];const t=stat(cur);
-  const right=j===q.a;
-  document.querySelectorAll('.opt').forEach(b=>{
+  if(answered||cur<0)return;answered=true;
+  const q=Q[cur],t={...stat(cur)},right=j===q.a;
+  for(const b of el.opts.children){
     const k=+b.dataset.j;
-    if(k===q.a)b.classList.add('right');
-    else if(k===j)b.classList.add('wrong');
-    else b.classList.add('faded');
-  });
+    b.classList.add(k===q.a?'right':k===j?'wrong':'faded');
+  }
   if(right){t.c++;t.s=t.s>0?t.s+1:1;S.streak++;S.today.c++;}
   else{t.w++;t.s=t.s<0?t.s-1:-1;S.streak=0;}
   S.q[cur]=t;S.today.n++;
-  $('exp').innerHTML=q.e+'<span class="cite">'+q.x+'</span>';
-  $('exp').style.display='block';
-  $('exp').style.borderLeftColor=right?'var(--right)':'var(--wrong)';
-  $('nextBtn').style.display='block';
+  el.exp.className='exp '+(right?'ok':'bad');
+  el.exp.textContent=q.e;
+  const c=document.createElement('span');c.className='cite';c.textContent=q.x;el.exp.append(c);
+  el.exp.hidden=false;el.nextBar.hidden=false;
+  el.exp.scrollIntoView({block:'nearest',behavior:'smooth'});
   save();renderStats();
 }
 
+el.opts.addEventListener('click',e=>{const b=e.target.closest('.opt');if(b)answer(+b.dataset.j);});
 $('nextBtn').addEventListener('click',next);
-
 $('filters').addEventListener('click',e=>{
   const c=e.target.closest('.chip');if(!c)return;
   filter=c.dataset.f;
-  document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));
+  for(const x of $('filters').children)x.classList.toggle('on',x===c);
   next();
 });
 
 function renderStats(){
-  $('sToday').textContent=S.today.n;
-  $('sAcc').textContent=S.today.n?Math.round(100*S.today.c/S.today.n)+'%':'—';
-  let weak=0;Q.forEach((q,i)=>{const t=stat(i);if(t.w>0&&t.s<2)weak++;});
-  $('sWeak').textContent=weak;
-  $('streak').textContent=S.streak>1?'🔥 '+S.streak:'';
-  let html='';
-  for(const c in CATS){
-    const idx=Q.map((q,i)=>i).filter(i=>Q[i].c===c);
-    const mastered=idx.filter(i=>stat(i).s>=2).length;
-    const pct=Math.round(100*mastered/idx.length);
-    html+='<div class="mrow"><div class="mlabel"><span>'+CATS[c]+'</span><span>'+mastered+'/'+idx.length+'</span></div><div class="mtrack"><div class="mfill" style="width:'+pct+'%"></div></div></div>';
+  el.today.textContent=S.today.n;
+  el.acc.textContent=S.today.n?Math.round(100*S.today.c/S.today.n)+'%':'—';
+  el.streak.textContent=S.streak>1?'🔥 '+S.streak:'';
+  const tot={},mas={};let weak=0;
+  for(const k in CATS){tot[k]=0;mas[k]=0;}
+  for(let i=0;i<Q.length;i++){
+    const t=stat(i),c=Q[i].c;tot[c]++;
+    if(t.s>=2)mas[c]++;
+    if(isWeak(t))weak++;
   }
-  $('mastery').innerHTML=html;
+  el.weak.textContent=weak;
+  el.mastery.innerHTML=Object.keys(CATS).map(c=>
+    '<div><div class="mlabel"><span>'+CATS[c]+'</span><span>'+mas[c]+'/'+tot[c]+'</span></div><div class="mtrack"><div class="mfill" style="width:'+Math.round(100*mas[c]/tot[c])+'%"></div></div></div>'
+  ).join('');
 }
 
-$('resetBtn').addEventListener('click',()=>{
-  if(!confirm('Wipe all drill progress?'))return;
-  S={q:{},today:{d:dkey(),n:0,c:0},streak:0};save();next();renderStats();toast('Fresh slate');
+// Tap twice to reset (browser confirm() popups don't show here)
+let armTimer;
+el.reset.addEventListener('click',()=>{
+  if(!el.reset.classList.contains('armed')){
+    el.reset.classList.add('armed');el.reset.textContent='Tap again to wipe';
+    clearTimeout(armTimer);
+    armTimer=setTimeout(()=>{el.reset.classList.remove('armed');el.reset.textContent='Reset Progress';},3000);
+    return;
+  }
+  clearTimeout(armTimer);el.reset.classList.remove('armed');el.reset.textContent='Progress wiped';
+  setTimeout(()=>{el.reset.textContent='Reset Progress';},1800);
+  S=fresh();recent=[];save();next();renderStats();
 });
 
 load();
 </script>
-</body>
-</html>
