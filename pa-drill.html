@@ -34,15 +34,16 @@
   h1 .dot{color:var(--gold)}
   .score{font-size:calc(16*var(--u));color:var(--gold);margin-left:calc(10*var(--u))}
   .sub{color:var(--dim);font-size:calc(11*var(--u));margin-top:calc(5*var(--u));text-transform:uppercase;letter-spacing:calc(1.2*var(--u));white-space:nowrap}
-  .stats{display:flex;gap:calc(6*var(--u));flex:none}
-  .stat{background:var(--slate);border:1px solid var(--line);border-radius:calc(10*var(--u));padding:calc(5*var(--u)) calc(6*var(--u));text-align:center;width:calc(58*var(--u))}
+  .stats{display:flex;gap:calc(5*var(--u));flex:none}
+  .stat{background:var(--slate);border:1px solid var(--line);border-radius:calc(10*var(--u));padding:calc(5*var(--u)) calc(4*var(--u));text-align:center;width:calc(54*var(--u))}
   .stat b{display:block;font-family:var(--display);font-size:calc(20*var(--u));line-height:1.1;font-variant-numeric:tabular-nums}
   .stat span{font-size:calc(10*var(--u));color:var(--dim);text-transform:uppercase;letter-spacing:calc(.8*var(--u))}
-  .stat b.g{color:var(--right)} .stat b.r{color:var(--wrong)}
+  .stat b.g{color:var(--right)} .stat b.r{color:var(--wrong)} .stat b.y{color:var(--gold)}
 
   .filters{display:flex;gap:calc(7*var(--u));flex:none;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-14*var(--u));padding-inline:calc(14*var(--u))}
   .filters::-webkit-scrollbar{display:none}
   .chip{flex:none;background:var(--slate);border:1px solid var(--line);color:var(--dim);border-radius:99px;padding:0 calc(15*var(--u));height:calc(40*var(--u));font-size:calc(15*var(--u));font-weight:700;cursor:pointer;font-family:var(--body);white-space:nowrap}
+  .chip.learn{color:var(--blue);border-color:rgba(109,178,255,.45)}
   .chip.on{color:var(--asphalt);background:var(--gold);border-color:var(--gold)}
   .chip.reset{background:none;font-size:calc(13*var(--u));text-transform:uppercase;letter-spacing:calc(.8*var(--u))}
   .chip.reset.armed{border-color:var(--wrong);color:var(--wrong)}
@@ -50,6 +51,7 @@
   .qcard{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:var(--slate);border:1px solid var(--line);border-radius:calc(18*var(--u));padding:calc(16*var(--u));display:flex;flex-direction:column}
   .qmeta{display:flex;justify-content:space-between;gap:calc(8*var(--u));font-size:calc(12*var(--u));color:var(--dim);text-transform:uppercase;letter-spacing:calc(1.1*var(--u));margin-bottom:calc(10*var(--u));flex:none}
   .qmeta .seen{color:var(--blue);text-align:right}
+  .qtext mark{background:none;color:var(--gold);text-decoration:underline;text-underline-offset:.15em;text-decoration-thickness:.08em}
   .qtext{font-size:var(--qs);font-weight:700;line-height:1.3;margin-bottom:calc(14*var(--u));text-wrap:pretty}
   #opts{display:flex;flex-direction:column;gap:calc(9*var(--u))}
   .opt{display:flex;gap:.6em;align-items:center;width:100%;text-align:left;background:var(--asphalt);border:1.5px solid var(--line);color:var(--chalk);border-radius:calc(13*var(--u));padding:.62em .85em;min-height:calc(var(--os)*2.9);font-size:var(--os);font-family:var(--body);font-weight:600;cursor:pointer;line-height:1.28}
@@ -59,12 +61,20 @@
   .opt.right .ltr,.opt.wrong .ltr{color:inherit}
   .opt.wrong{background:rgba(255,107,99,.13);border-color:var(--wrong);color:var(--wrong)}
   .opt.faded{opacity:.4}
+  #opts.locked .opt{opacity:.5;pointer-events:none}
+  #opts{transition:none}
   .exp{background:var(--asphalt);border-left:calc(5*var(--u)) solid var(--gold);border-radius:calc(10*var(--u));padding:.65em .85em;font-size:var(--es);line-height:1.42;margin-top:calc(12*var(--u))}
   .exp.pending{visibility:hidden}
-  .exp.ok{border-left-color:var(--right)} .exp.bad{border-left-color:var(--wrong)}
-  .exp .cite{color:var(--dim);font-size:.78em;display:block;margin-top:.35em;letter-spacing:.03em}
+  .exp.ok{border-left-color:var(--right)} .exp.bad{border-left-color:var(--wrong)} .exp.teach{border-left-color:var(--blue)}
+  .exp[data-verdict]:not([data-verdict=''])::before{content:attr(data-verdict);display:block;color:var(--wrong);font-weight:700;margin-bottom:.3em}
+  .xrow+.xrow{margin-top:.45em}
+  .xrow.rule{font-weight:600}
+  .xrow b{color:var(--gold);font-weight:700}
+  .xrow.conf b{color:var(--blue)}
+  .exp .cite.unv{color:var(--gold)}
+  .exp .cite{color:var(--dim);font-size:.8em;display:block;margin-top:.45em;letter-spacing:.03em}
 
-  .mast{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(10*var(--u));flex:none}
+  .mast{display:grid;grid-template-columns:repeat(5,1fr);gap:calc(8*var(--u));flex:none}
   .mlabel{display:flex;justify-content:space-between;gap:calc(4*var(--u));font-size:calc(10.5*var(--u));color:var(--dim);margin-bottom:calc(4*var(--u));text-transform:uppercase;letter-spacing:calc(.6*var(--u));font-variant-numeric:tabular-nums;white-space:nowrap}
   .mtrack{height:calc(5*var(--u));background:var(--slate);border-radius:99px;overflow:hidden}
   .mfill{height:100%;background:var(--gold);border-radius:99px}
@@ -77,26 +87,31 @@
 </head>
 <body>
 
+
 <div class="app">
   <header class="top">
     <div class="brand">
       <h1>DRILL<span class="dot">.</span><span class="score" id="streak"></span></h1>
-      <div class="sub">IL Public Adjuster · <span id="bankN"></span> Qs</div>
+      <div class="sub">IL PA Exam · <span id="bankN"></span> Qs</div>
     </div>
     <div class="stats">
       <div class="stat"><b id="sToday">0</b><span>Today</span></div>
       <div class="stat"><b class="g" id="sAcc">—</b><span>Acc</span></div>
       <div class="stat"><b class="r" id="sWeak">0</b><span>Weak</span></div>
+      <div class="stat"><b class="y" id="sRush">0</b><span>Rushed</span></div>
     </div>
   </header>
 
   <nav class="filters" id="filters">
-    <button class="chip on" data-f="all">All</button>
+    <button class="chip on" data-f="all">Exam Mix</button>
+    <button class="chip learn" data-f="learn">Learn New</button>
     <button class="chip" data-f="weak">Weak Spots</button>
-    <button class="chip" data-f="law">IL Law</button>
-    <button class="chip" data-f="claims">Carrier Rules</button>
-    <button class="chip" data-f="concepts">Concepts</button>
-    <button class="chip" data-f="product">Policies</button>
+    <button class="chip" data-f="traps">Number Traps</button>
+    <button class="chip" data-f="s1">I Products</button>
+    <button class="chip" data-f="s2">II Terms</button>
+    <button class="chip" data-f="s3">III Contract</button>
+    <button class="chip" data-f="s4">IV Building</button>
+    <button class="chip" data-f="s5">V IL Law</button>
     <button class="chip reset" id="resetBtn">Reset Progress</button>
   </nav>
 
@@ -112,132 +127,224 @@
 </div>
 
 <script>
-// Question bank — derived from the Illinois PA study guide (215 ILCS 5/1501-1615, 50 Ill. Admin. Code 919 & 3118).
-// c: law=IL statutes/rules, claims=carrier conduct/timelines, concepts=insurance concepts, product=policy/product knowledge
+// Question bank v5 — weighted to the Pearson VUE IL-PubAdj17 outline (eff. 1/1/2026): I 35% · II 25% · III 5% · IV 10% · V 25%.
+// s=section, t=topic (Learn mode walks topics in order), w=the rule, i="now why is that important?", k=don't confuse with,
+// x=source, nt=number trap, fix=keep option order, v:0 = from the Feb guides, not yet confirmed against statute text.
 const Q=[
-{c:"law",q:"Minimum surety bond or irrevocable letter of credit for an Illinois PA?",o:["$10,000","$20,000","$50,000","$100,000"],a:2,e:"$50,000 minimum financial responsibility.",x:"215 ILCS 5/1560(a)"},
-{c:"law",q:"Resident PA license fee in Illinois?",o:["$92 annually","$250 every 2 years","$500 every 2 years","$50 annually"],a:1,e:"Resident: $250 biennially. Nonresident: $500.",x:"§ 1563(1)"},
-{c:"law",q:"Nonresident PA license fee?",o:["$250 every 2 years","$350 every 2 years","$500 every 2 years","$500 annually"],a:2,e:"Nonresident fee is $500 every 2 years.",x:"§ 1563(1)"},
-{c:"law",q:"Business entity PA license fee?",o:["$100 / 2 yrs","$250 / 2 yrs","$500 / 2 yrs","$1,000 / 2 yrs"],a:1,e:"Business entity: $250 biennially, same as resident individual.",x:"§ 1563(2)"},
-{c:"law",q:"Continuing education required each biennium?",o:["12 hrs incl 2 ethics","20 hrs incl 4 ethics","24 hrs incl 3 ethics","30 hrs incl 5 ethics"],a:2,e:"24 hours biennially including 3 hours of ethics.",x:"§ 1565(a)"},
-{c:"law",q:"CE must be completed how long before renewal date?",o:["By renewal date","15 days before","30 days before","60 days before"],a:2,e:"CE must be done at least 30 days before renewal.",x:"Licensing pathway"},
-{c:"law",q:"How long must a PA retain transaction records?",o:["3 years after close","5 years after termination","7 years after termination","10 years after signing"],a:2,e:"7 years after termination of the transaction, open to Director examination.",x:"§ 1585"},
-{c:"law",q:"Minimum age for an Illinois PA license?",o:["16","18","21","25"],a:1,e:"18 years minimum.",x:"§ 1525(b)(1)"},
-{c:"law",q:"A lapsed license may be reinstated within 12 months by paying:",o:["The standard renewal fee","Double the unpaid renewal fee","A $1,000 penalty","Nothing — retake the exam"],a:1,e:"Within 12 months, penalty is double the unpaid renewal fee.",x:"§ 1545(e)"},
-{c:"law",q:"The insured may rescind a PA contract within:",o:["3 days of signing","5 business days after signing","5 business days after the insurer receives the contract copy","10 calendar days of loss"],a:2,e:"Clock starts when the INSURER receives the copy — not at signing.",x:"§ 1575(j)"},
-{c:"law",q:"Valid methods for an insured to cancel a PA contract include all EXCEPT:",o:["Certified/registered mail","Personal service","Email","Text message"],a:3,e:"Certified mail, personal service, or email. Text is not listed.",x:"§ 1575(j)",fix:1},
-{c:"law",q:"After execution, the PA must send the insurer an exact contract copy by email within:",o:["24 hours","3 business days","5 business days","10 business days"],a:2,e:"5 business days of execution.",x:"§ 1575(j)"},
-{c:"law",q:"If the insured rescinds, the PA must return anything of value within:",o:["5 business days","10 business days","15 business days","30 days"],a:2,e:"15 business days.",x:"§ 1575(j)"},
-{c:"law",q:"If the insurer pays or commits in writing to policy limits within 5 business days of the loss being reported, the PA may collect:",o:["The full contracted percentage","Half the contracted percentage","Only reasonable hourly compensation for services rendered","Nothing at all"],a:2,e:"No percentage commission — hourly only, and PA must tell the insured recovery may not increase.",x:"§ 1575(c)"},
-{c:"law",q:"Maximum PA fee on a personal residence claim in Illinois?",o:["10% — but only during catastrophes","10% — blanket cap, no exceptions","15% with written consent","20% with Director approval"],a:1,e:"Blanket 10% cap on personal residence claims — cannot be waived by contract.",x:"§ 1570(e)"},
-{c:"law",q:"For NON-personal-residence property, the 10% fee cap applies:",o:["Always","Never","Only during a declared catastrophic event","Only for claims over $100,000"],a:2,e:"Cap kicks in only during declared catastrophes for non-personal-residence property.",x:"§ 1570"},
-{c:"law",q:"A catastrophic event declaration is effective for:",o:["30 days, renewable 30 days","60 days, renewable 60 days","90 days, renewable in 30-day intervals, county-by-county","1 year statewide"],a:2,e:"90 days, renewable in 30-day intervals, applied county-by-county.",x:"§ 1570"},
-{c:"law",q:"The Director must act on a fee-cap exception request within:",o:["5 business days","10 business days","15 business days","30 days"],a:0,e:"5 business days.",x:"§ 1570"},
-{c:"law",q:"Under Rule 3118.90, the PA fee must be based on:",o:["The gross settlement including deductible","The net claim payment, excluding the deductible","The RCV estimate","The first check only"],a:1,e:"Fee excludes the deductible — based only on net claim payment by the insurer.",x:"Rule 3118.90"},
-{c:"law",q:"PA contracts must be printed in no less than:",o:["8-point font","10-point font","12-point font","14-point font"],a:1,e:"At least 10-point font, with form number/edition in the lower left corner.",x:"Rule 3118.80"},
-{c:"law",q:"Before using a contract form, a PA must:",o:["Have an attorney review it","File it with the IDOI for approval","Register it with Pearson VUE","Notarize it"],a:1,e:"Contract forms must be filed with and approved by IDOI before use.",x:"§ 1575; Rule 3118.80"},
-{c:"law",q:"Which is a PROHIBITED term in an Illinois PA contract?",o:["Naming the PA as co-payee on checks","A power of attorney letting the PA act in place of the insured","Stating the exact compensation percentage","Disclosing financial interests"],a:1,e:"Power of attorney provisions are expressly forbidden. Co-payee is permitted.",x:"§ 1575(e)(5)"},
-{c:"law",q:"Which contract term is also prohibited?",o:["Collecting the entire fee from the first check","Requiring 10-point font","An entire-agreement statement","A description of services"],a:0,e:"Fees on money not yet paid, or the entire fee from the first check, are prohibited.",x:"§ 1575(e)"},
-{c:"law",q:"A hold-harmless clause protecting the PA from their own negligence is:",o:["Allowed with disclosure","Allowed if mutual","Prohibited","Required"],a:2,e:"Indemnification/hold-harmless for the PA's own negligence is a prohibited term.",x:"§ 1575(e)"},
-{c:"law",q:"The pre-signing disclosure must explain:",o:["The insurer's complaint history","The three types of adjusters: company, independent, public","The expected settlement amount","The PA's prior claims"],a:1,e:"Plus: insured is not required to hire a PA; PA does not represent insurer or IDOI; fee is the insured's obligation.",x:"§ 1575(f)"},
-{c:"law",q:"PA solicitation is prohibited between:",o:["6 p.m. and 9 a.m.","7 p.m. and 8 a.m.","8 p.m. and 8 a.m.","9 p.m. and 6 a.m."],a:1,e:"No soliciting 7:00 p.m. – 8:00 a.m. Signing a previously arranged contract is not soliciting.",x:"§ 1590(b)"},
-{c:"law",q:"A PA may NOT solicit while:",o:["It is raining","The fire department is at the damaged premises","The insured is at work","An adjuster is inspecting"],a:1,e:"No soliciting while the fire department is on site or while the loss-producing occurrence continues.",x:"§ 1590(b)"},
-{c:"law",q:"The statutory fiduciary standard requires a PA to serve with:",o:["Reasonable care","Objectivity and complete loyalty to the client's interests alone","Good faith toward both parties","Professional courtesy"],a:1,e:"The exact statutory phrase: objectivity and complete loyalty — to the client alone, never the carrier.",x:"§ 1590(a)"},
-{c:"law",q:"A PA may acquire an interest in salvage only with:",o:["Verbal permission anytime","The insurer's approval","The insured's written permission obtained AFTER settlement","Director approval"],a:2,e:"Written permission, and only after the claim is settled.",x:"§ 1590(e)"},
-{c:"law",q:"When recommending a contractor, Rule 3118.90 requires the PA to present:",o:["One licensed bid","At least two competitive bids","Three bids minimum","The cheapest option"],a:1,e:"At least two competitive bids, plus verify liability insurance, performance bond, licenses, and written warranty.",x:"Rule 3118.90"},
-{c:"law",q:"If a PA refers an insured to a contractor, the PA:",o:["Has no further obligation","Warrants the workmanship and is responsible for deficient work costs","Gets an automatic referral fee","Must supervise daily"],a:1,e:"The PA warrants workmanship and bears costs to complete or repair deficient work.",x:"Rule 3118.90"},
-{c:"law",q:"A client who chooses a contractor other than the PA's recommendation:",o:["May be charged a higher fee","Must sign a waiver","Shall NOT be charged higher fees","Voids the contract"],a:2,e:"No fee penalty for choosing a different contractor.",x:"Rule 3118.90; Bulletin 2024-16"},
-{c:"law",q:"A PA agrees to a settlement without the insured's knowledge. This is:",o:["Fine if favorable","Prohibited — consent is required","Allowed under power of attorney","Allowed for small claims"],a:1,e:"No settlement without the insured's knowledge and consent.",x:"§ 1590(k)"},
-{c:"law",q:"A PA advising a client on their legal rights to sue the insurer is:",o:["Part of the job","Unauthorized practice of law — prohibited","Fine with disclosure","Allowed if the PA passed the exam"],a:1,e:"PAs cannot provide legal advice or practice law.",x:"§ 1590(l)"},
-{c:"law",q:"A PA may advance money to an insured pending adjustment:",o:["Never","Up to $1,000","Only for emergency services","With 10% interest"],a:2,e:"Advancing value is prohibited EXCEPT for emergency services.",x:"§ 1590(g)"},
-{c:"law",q:"Client funds held by a PA must be deposited in:",o:["The PA's business account","An interest-bearing trust, interest to client","A non-interest-bearing escrow/trust at an FDIC-insured institution","Any bank account"],a:2,e:"Non-interest-bearing escrow or trust, FDIC-insured, in the PA's home state or where the loss occurred.",x:"§ 1580"},
-{c:"law",q:"Maximum civil penalty: per cause / total?",o:["$5,000 / $50,000","$10,000 / $100,000","$25,000 / $250,000","$10,000 / unlimited"],a:1,e:"Up to $10,000 per cause, $100,000 maximum total.",x:"§ 1555(d)"},
-{c:"law",q:"After license revocation, a PA may reapply after:",o:["1 year","3 years","5 years","Never"],a:2,e:"Ineligible to reapply for 5 years. Suspensions can also last up to 5 years.",x:"§ 1555(f)"},
-{c:"law",q:"Acting as a PA without a license is:",o:["A civil violation only","A Class B misdemeanor","A Class A misdemeanor","A Class 4 felony"],a:2,e:"Unlicensed PA activity = Class A misdemeanor.",x:"§ 1610"},
-{c:"law",q:"Misappropriating or converting client funds is:",o:["A Class A misdemeanor","A Class 4 felony","A civil matter","Grounds for fine only"],a:1,e:"Class 4 felony — and a fiduciary breach.",x:"§ 1610"},
-{c:"law",q:"For a felony conviction, the Director considers whether this much time has passed without subsequent conviction:",o:["2 years","5 years since conviction or 3 since release, whichever is later","10 years flat","7 years since sentencing"],a:1,e:"5 years since felony conviction or 3 years since release from confinement, whichever is later.",x:"§ 1550"},
-{c:"law",q:"A PA must report an administrative action in another state within:",o:["10 days of filing","30 days of final disposition","60 days of final disposition","At renewal"],a:1,e:"30 days of final disposition. Criminal prosecutions: 30 days of initial pretrial hearing.",x:"§ 1595"},
-{c:"law",q:"A PA must notify the Director of an address change within:",o:["10 days","30 days","60 days","90 days"],a:1,e:"30 days.",x:"§ 1540"},
-{c:"law",q:"If a nonresident PA's home-state license terminates, the Illinois license:",o:["Continues to renewal","Terminates immediately","Converts to resident","Suspends 90 days"],a:1,e:"Terminates immediately — reciprocity depends on the home-state license.",x:"§ 1540"},
-{c:"law",q:"An applicant may be exempt from the Illinois exam if licensed as a PA in another state for at least:",o:["6 months","12 months in good standing","24 months","5 years"],a:1,e:"12 months in good standing. A PA moving to Illinois must apply within 90 days of residency.",x:"§ 1535"},
-{c:"law",q:"A contract entered by an unlicensed person acting as a PA is:",o:["Voidable by the insurer","Valid if fees are reasonable","Void and invalid","Enforceable up to $5,000"],a:2,e:"Void and invalid.",x:"§ 1515(e)"},
-{c:"law",q:"Which person is EXEMPT from PA licensing?",o:["A contractor negotiating settlements","An Illinois attorney acting in professional capacity","A real estate agent estimating damage","An independent adjuster hired by the insured"],a:1,e:"Exempt: attorneys, life/health/annuity negotiators, technical-assistance-only experts, health providers filing forms, insurer-to-insurer subrogation.",x:"§ 1515(d)"},
-{c:"law",q:"A photographer hired only to document damage, who never negotiates:",o:["Needs a PA license","Is exempt — technical assistance only","Needs a producer license","Is exempt only under $10,000"],a:1,e:"Technical assistance persons (photographers, engineers, estimators, PIs) who do not negotiate are exempt.",x:"§ 1515(d)"},
-{c:"law",q:"Public adjusters handle which claims?",o:["First-party AND third-party","First-party property claims only","Liability claims","Life and health claims"],a:1,e:"First-party only — the insured's own policy. Never liability/third-party.",x:"§ 1510"},
-{c:"law",q:"After passing the exam, you must wait how long before applying for the license?",o:["No wait","5 days","30 days","90 days"],a:1,e:"Wait 5 days after passing, then apply through NIPR with the $250 fee.",x:"Licensing pathway"},
-{c:"law",q:"Before entering ANY PA contracts, you need:",o:["Just the license","Just IDOI contract approval","BOTH the IDOI-approved contract form AND the issued license","A surety bond only"],a:2,e:"Two separate processes — both must be complete first.",x:"Licensing pathway"},
-{c:"law",q:"Fingerprinting for an Illinois PA license:",o:["Is optional","Is required — ISP and FBI checks","Only for nonresidents","Only after a complaint"],a:1,e:"Required via Illinois-approved Live Scan vendor; ISP and FBI background checks.",x:"§ 1520"},
-{c:"law",q:"A PA paying a commission to an unlicensed person who is required to be licensed:",o:["Is fine under $500","Violates § 1570(a)","Is allowed with disclosure","Is allowed for referrals only"],a:1,e:"Cannot pay commissions to unlicensed persons required to be licensed; unlicensed persons cannot accept adjusting fees.",x:"§ 1570(a),(b)"},
-{c:"claims",q:"Maximum time for an insurer to acknowledge claim communications?",o:["10 working days","15 working days","21 working days","30 calendar days"],a:1,e:"15 working days — the reasonable promptness standard.",x:"50 IAC 919.40"},
-{c:"claims",q:"Maximum time to begin a prompt investigation when liability is reasonably clear?",o:["15 working days","21 working days","30 calendar days","45 days"],a:1,e:"21 working days — bona fide effort to communicate with all parties.",x:"50 IAC 919.40"},
-{c:"claims",q:"After affirming liability with amount determined, the insurer must offer payment within:",o:["15 days","21 days","30 days","45 days"],a:2,e:"30 days. Undisputed amounts must also be tendered within 30 days.",x:"50 IAC 919.50"},
-{c:"claims",q:"If a first-party claim is denied, written explanation is due within:",o:["15 working days of denial","21 working days","30 days after investigation and liability determination","60 days of claim"],a:2,e:"30 days after the investigation and determination are completed.",x:"50 IAC 919.50"},
-{c:"claims",q:"The median payment period beyond which fire/extended coverage delay is unreasonable:",o:["30 days","40 calendar days","60 days","75 days"],a:1,e:"40 calendar days.",x:"50 IAC 919.80(d)(7)"},
-{c:"claims",q:"A fire claim unresolved 80 days from report requires the insurer to:",o:["Pay in full","Provide written delay explanation + Notice of Availability of the DOI","Go to arbitration","Request an extension"],a:1,e:"Trigger is 75 calendar days from report (or 25 days after proof of loss, whichever is less).",x:"50 IAC 919.80(d)(7)"},
-{c:"claims",q:"An insurer may require which of the following?",o:["A polygraph examination","An examination under oath, if the policy authorizes it","Proof of loss faster than the policy states","A release notation on a partial-payment check"],a:1,e:"EUO is permitted if authorized by the policy; polygraphs are prohibited.",x:"50 IAC 919.60"},
-{c:"claims",q:"A check may be marked final or a release only if:",o:["The adjuster approves","Policy limits have been paid OR a bona fide dispute exists","The claim exceeds $10,000","The insured agrees verbally"],a:1,e:"Otherwise prohibited.",x:"50 IAC 919"},
-{c:"claims",q:"Illinois defines Actual Cash Value as:",o:["Market value","Replacement cost at time of loss minus depreciation","Purchase price minus deductible","Assessed tax value"],a:1,e:"RCV at time of loss minus depreciation; depreciation worksheets must be provided on request.",x:"50 IAC 919.80(d)(8)"},
-{c:"claims",q:"Section 154.6 (unfair claims practices) can be enforced by:",o:["Private policyholder lawsuits","The Director of Insurance only","Class actions","County prosecutors"],a:1,e:"Regulatory only — NO private right of action. Acts must be knowing or show a persistent tendency.",x:"215 ILCS 5/154.6, 154.5"},
-{c:"claims",q:"Which is an unfair claims practice under § 154.6?",o:["Requesting documentation","Inspecting before payment","Compelling suit by offering substantially less than amounts ultimately recovered","Denying a fraudulent claim"],a:2,e:"Also: misrepresenting facts/provisions, failing to acknowledge promptly, no good-faith settlement when liability is clear, denying without reasonable investigation.",x:"§ 154.6"},
-{c:"claims",q:"Section 155 bad-faith sanctions require the insurer's conduct to be:",o:["Negligent","Vexatious and unreasonable","Fraudulent","Criminal"],a:1,e:"Plus the insured must prevail on the underlying breach of contract claim.",x:"215 ILCS 5/155"},
-{c:"claims",q:"Maximum Section 155 penalty is the LESSER of: 60% of recovery, the excess over the pre-suit offer, or:",o:["$25,000","$50,000","$60,000","$100,000"],a:2,e:"60% / $60,000 / excess over pre-suit offer — whichever is least, plus attorney fees.",x:"215 ILCS 5/155"},
-{c:"claims",q:"Section 155 is best described as:",o:["A standalone cause of action","An extracontractual remedy attached to the contract claim","A criminal statute","An arbitration clause"],a:1,e:"A remedy, not a standalone claim. Courts use a totality-of-circumstances standard.",x:"215 ILCS 5/155"},
-{c:"claims",q:"With every denial or delay explanation, the carrier must include:",o:["A check for partial payment","The Notice of Availability of the Department of Insurance","An appraisal demand","Attorney contact info"],a:1,e:"The DOI availability notice accompanies denials and delay explanations.",x:"50 IAC 919"},
-{c:"concepts",q:"Under indemnity, a $50,000 loss on a property insured for $75,000 pays:",o:["$75,000","$50,000","$25,000","$62,500"],a:1,e:"Lesser of actual loss or policy limit — no better, no worse than pre-loss.",x:"Principle of indemnity"},
-{c:"concepts",q:"Which are EXCEPTIONS to strict indemnity?",o:["Subrogation and contribution","Replacement cost coverage and valued policies","Deductibles","Named perils"],a:1,e:"RCV and valued policies can pay more than strict pre-loss value.",x:"Indemnity"},
-{c:"concepts",q:"For PROPERTY insurance, insurable interest must exist:",o:["At policy inception","At time of loss","At both","At renewal"],a:1,e:"At time of loss. Life insurance: at inception. Sources: ownership, secured creditor, lease, legal liability.",x:"Insurable interest",fix:1},
-{c:"concepts",q:"The insurer's right to recover from a negligent third party after paying the insured:",o:["Contribution","Indemnification","Subrogation","Estoppel"],a:2,e:"Subrogation — insurer steps into the insured's shoes. Insured must be made whole first; doesn't apply to life insurance.",x:"Subrogation"},
-{c:"concepts",q:"An insured signs a release with the negligent party before the insurer recovers. The insured has:",o:["Exercised their rights","Impaired the insurer's subrogation rights","Triggered estoppel","Waived the deductible"],a:1,e:"The insured cannot impair subrogation — this can jeopardize the claim.",x:"Subrogation"},
-{c:"concepts",q:"An insurer continues investigating after discovering a policy violation. This may constitute:",o:["Estoppel","Waiver","Concealment","Rebating"],a:1,e:"Waiver = voluntary relinquishment of a known right. Estoppel is court-imposed after reasonable reliance.",x:"Waiver vs estoppel"},
-{c:"concepts",q:"Reservation-of-rights letters and non-waiver agreements exist to:",o:["Speed up settlement","Prevent inadvertent waiver","Force appraisal","Extend deadlines"],a:1,e:"They preserve the insurer's right to deny while investigating.",x:"Waiver"},
-{c:"concepts",q:"Intentional failure to disclose a material fact is:",o:["A representation","Concealment — can void coverage","A warranty","Twisting"],a:1,e:"Representations must be substantially true; warranties literally true (mostly marine); concealment can void.",x:"Utmost good faith"},
-{c:"concepts",q:"Building worth $1,000,000, 80% coinsurance, $500,000 carried, $200,000 loss. Payment?",o:["$200,000","$160,000","$125,000","$100,000"],a:2,e:"(500k ÷ 800k) × 200k = $125,000. Insured eats $75,000 penalty.",x:"Coinsurance formula"},
-{c:"concepts",q:"Building valued $500,000, insured $300,000, 80% coinsurance, $100,000 loss. Insurer pays:",o:["$100,000","$75,000","$60,000","$80,000"],a:1,e:"Required = 400k. (300k ÷ 400k) × 100k = $75,000.",x:"Coinsurance formula"},
-{c:"concepts",q:"ACV $200,000, replacement cost $280,000. Depreciation =",o:["$80,000","$200,000","$280,000","$480,000"],a:0,e:"ACV = RC − Depreciation → 280k − 200k = $80,000.",x:"ACV formula"},
-{c:"concepts",q:"Under RCV coverage, the insured typically receives:",o:["Full RCV upfront","ACV first, recoverable depreciation after repairs are completed","Depreciation only","Market value"],a:1,e:"ACV check first; holdback released once repairs complete.",x:"ACV vs RCV"},
-{c:"concepts",q:"A 2% wind deductible on a $300,000 dwelling =",o:["2% of the loss","$6,000 — calculated on the insured value","$3,000","$600"],a:1,e:"Percentage deductibles compute on insured VALUE, not the loss amount.",x:"Deductibles"},
-{c:"concepts",q:"A franchise deductible means:",o:["A flat dollar amount always applies","Below threshold nothing is paid; above it the ENTIRE loss is paid","The deductible doubles each claim","Only commercial use"],a:1,e:"All-or-nothing threshold structure.",x:"Deductibles"},
-{c:"concepts",q:"Two policies cover one loss: $100k and $300k limits, $80k loss. Pro rata, the $100k policy pays:",o:["$40,000","$20,000","$26,667","$80,000"],a:1,e:"(100k ÷ 400k) × 80k = $20,000. Each insurer pays its share of total limits.",x:"Pro rata contribution"},
-{c:"concepts",q:"Offering a fee discount tied to using the PA's preferred contractor is functionally:",o:["Twisting","Churning","Rebating — prohibited","Smart marketing"],a:2,e:"Rebating = returning value as an inducement. Twisting = replacement via misrepresentation; churning = policies for commissions.",x:"Ethics"},
-{c:"concepts",q:"Mixing client funds with personal funds is called:",o:["Conversion","Commingling","Subrogation","Contribution"],a:1,e:"Commingling violates fiduciary duty. Outright taking = misappropriation (Class 4 felony).",x:"§ 1580, 1610"},
-{c:"product",q:"The four components of a property policy:",o:["Application, binder, rider, endorsement","Declarations, insuring agreement, conditions, exclusions","Premium, limit, deductible, term","Offer, acceptance, consideration, legality"],a:1,e:"Dec page (who/what/limits), insuring agreement (the promise), conditions (duties), exclusions.",x:"Policy structure"},
-{c:"product",q:"Under NAMED perils coverage, the burden of proving cause of loss falls on:",o:["The insurer","The insured","The adjuster","Neither"],a:1,e:"Named perils: insured proves a listed peril caused it. Open perils: insurer must prove an exclusion.",x:"Named vs open perils"},
-{c:"product",q:"Mysterious ceiling stain, HO-3, no known cause. Coverage for the dwelling turns on:",o:["The insured proving a covered peril","The insurer proving an excluded peril caused it","Who filed proof of loss","Automatic denial"],a:1,e:"HO-3 dwelling = open perils → insurer bears the exclusion burden. Can't prove it? Covered.",x:"HO-3 burden of proof"},
-{c:"product",q:"HO-3 covers the dwelling on what basis?",o:["Named perils, ACV","Named perils, RCV","Open perils, ACV","Open perils, RCV"],a:3,e:"Dwelling: open perils at RCV. Personal property: named perils, typically ACV.",x:"HO-3",fix:1},
-{c:"product",q:"Which form covers BOTH dwelling and contents on open perils?",o:["HO-2","HO-3","HO-5","HO-8"],a:2,e:"HO-5 Comprehensive — the broadest standard form.",x:"HO forms"},
-{c:"product",q:"HO-4 is designed for:",o:["Condo owners","Renters — personal property only","Older homes","Mobile homes"],a:1,e:"HO-4 renters (named perils, contents). HO-6 condo. HO-7 mobile home. HO-8 older home (ACV).",x:"HO forms"},
-{c:"product",q:"HO-8 exists for homes where:",o:["Flood risk is high","Replacement cost exceeds market value","The owner rents rooms","Construction is fire-resistive"],a:1,e:"Older homes — ACV basis, limited named perils.",x:"HO-8"},
-{c:"product",q:"An insured wants to abandon damaged property to the insurer and collect a total loss:",o:["Allowed with notice","Not allowed — abandonment is prohibited","Allowed for vehicles","Allowed after 60 days"],a:1,e:"The insurer retains the option to repair, rebuild, or replace.",x:"Abandonment"},
-{c:"product",q:"One earring of a $5,000 pair is lost. The pair-and-set clause means the insurer pays:",o:["$5,000","$2,500 automatically","The reduction in value or cost to replace the lost piece","Nothing"],a:2,e:"Not the full set value — only the diminution or replacement of the lost part.",x:"Pair and set"},
-{c:"product",q:"The appraisal clause resolves disputes over:",o:["Coverage questions","The amount of loss","Bad faith","Premiums"],a:1,e:"Amount only. Each side picks an appraiser, they pick an umpire; any two of three bind. Each pays own appraiser; umpire split.",x:"Appraisal clause"},
-{c:"product",q:"Under a mortgage clause, the lender's coverage:",o:["Falls with the homeowner's violations","Is independent — not invalidated by the homeowner's acts","Requires a separate policy","Covers contents"],a:1,e:"Mortgagee protected independently; insurer must give the lender separate cancellation notice.",x:"Mortgage clause"},
-{c:"product",q:"Sworn proof of loss under the Standard Fire Policy is typically due within:",o:["30 days","60 days","90 days","6 months"],a:1,e:"60 days. The 1943 NY SFP also set the 12-month suit limitation and appraisal procedure.",x:"Standard Fire Policy"},
-{c:"product",q:"The 1943 New York Standard Fire Policy established all EXCEPT:",o:["60-day proof of loss","12-month suit limitation","The appraisal procedure","Flood coverage"],a:3,e:"Flood is excluded from standard policies — NFIP is a separate federal program.",x:"SFP / NFIP",fix:1},
-{c:"product",q:"A flood destroys a home with a standard HO-3 and no flood coverage. The PA should:",o:["Argue open perils covers it","File it as wind damage","Explain the exclusion and point the insured to NFIP/FEMA","Refer to a bad-faith attorney"],a:2,e:"Filing as wind = fraud. Honesty is the fiduciary duty; NFIP is the flood path.",x:"Fiduciary + NFIP"},
-{c:"product",q:"The insurer broadens coverage with no premium increase. Existing policies:",o:["Must be rewritten","Automatically get the broader coverage via the liberalization clause","Stay unchanged until renewal","Need an endorsement"],a:1,e:"Liberalization clause applies the improvement automatically.",x:"Liberalization"},
-{c:"product",q:"Which is a standard property policy exclusion?",o:["Hail","Lightning","Earthquake","Windstorm"],a:2,e:"Standard exclusions: flood, earthquake, war, intentional acts, wear and tear, nuclear, government action.",x:"Exclusions"},
-{c:"product",q:"Duties after loss include all EXCEPT:",o:["Prompt notice and protecting property","Preparing an inventory and showing the damage","Submitting to EUO and producing records","Abandoning the property to the insurer"],a:3,e:"Abandonment is never a duty — it's prohibited.",x:"Duties after loss",fix:1},
-{c:"law",q:"Exam structure: questions / minutes / passing score?",o:["100 / 120 / 75 raw","100 / 165 / 70 scaled","150 / 180 / 70%","80 / 90 / 65 scaled"],a:1,e:"100 scored questions, 165 minutes, scaled 70 (NOT a raw percentage). Test centers only.",x:"IL-PubAdj17"},
-{c:"law",q:"Retake waiting periods after failing?",o:["None","7 days after first fail; 30 days after second+","30 days always","14 / 60 days"],a:1,e:"7 days after the first fail, 30 days after second or subsequent fails.",x:"Pearson VUE"},
-{c:"law",q:"Illinois statute questions make up how much of the exam?",o:["10","25","35","50"],a:1,e:"25 questions IL law, 25 terms/concepts, 35 product knowledge, 10 estimating, 5 policy provisions.",x:"Content outline",fix:1}
+// ───────── SECTION I · PROPERTY PRODUCTS (35%) ─────────
+{s:1,t:"HO forms",q:"Which homeowners form covers BOTH the dwelling and personal property on an open-perils basis?",o:["HO-2","HO-3","HO-5","HO-8"],a:2,w:"HO-5 is open perils on dwelling AND contents — the broadest standard form.",i:"Open perils flips the burden: the carrier must prove an exclusion. That's why HO-5 claims are easier to win.",k:"HO-3 = open on the dwelling only; contents stay named perils.",x:"ISO HO forms",fix:1},
+{s:1,t:"HO forms",q:"An HO-3 gives NAMED-perils protection to:",o:["The dwelling only","Personal property (Coverage C) only","Both dwelling and contents","Other structures only"],a:1,w:"HO-3: dwelling and other structures are open perils; personal property is named perils.",i:"Most-tested form. Same policy, two different burdens of proof depending on what got damaged.",k:"HO-5 makes contents open perils too.",x:"ISO HO 00 03"},
+{s:1,t:"HO forms",q:"HO-3 dwelling damage with no clear cause. Who carries the burden?",o:["The insured must prove a covered peril","The insurer must prove an exclusion applies","The adjuster decides","Neither — it's automatically denied"],a:1,w:"Open perils: everything is covered unless excluded, so the insurer must prove the exclusion.",i:"Your strongest claims weapon: make the carrier show which exclusion and why, in writing.",k:"Named perils is the reverse: insured proves a listed peril.",x:"Burden of proof"},
+{s:1,t:"HO forms",q:"HO-4 is written for:",o:["Condo unit owners","Renters — contents, no dwelling","Older homes","Mobile homes"],a:1,w:"HO-4 renters: personal property + liability, no dwelling coverage.",i:"Renters have no building to claim — the landlord's policy covers the structure.",k:"HO-6 is condo owners (walls-in).",x:"ISO HO forms"},
+{s:1,t:"HO forms",q:"HO-6 is written for:",o:["Renters","Condo unit owners — walls-in coverage","Older homes","Seasonal homes"],a:1,w:"HO-6 covers the unit's interior improvements and contents; the association insures the structure.",i:"Condo claims often split between two policies — know which one owns the damage.",k:"HO-4 renters; HO-8 older homes.",x:"ISO HO forms"},
+{s:1,t:"HO forms",q:"HO-8 exists for homes where:",o:["Flood risk is high","Replacement cost far exceeds market value","The owner rents rooms","Construction is fire-resistive"],a:1,w:"HO-8 (modified) pays on a repair/ACV basis when rebuilding would cost far more than the home is worth.",i:"Insuring a $90K house for $300K replacement invites moral hazard — HO-8 removes that.",k:"Moral hazard = intent; morale hazard = carelessness.",x:"ISO HO 00 08"},
+{s:1,t:"HO forms",q:"HO-2 (Broad Form) covers the dwelling on what basis?",o:["Open perils","Named perils (broad list)","Fire only","Agreed value"],a:1,w:"HO-2 is named perils on both dwelling and contents.",i:"On an HO-2, the insured must prove the cause fits a listed peril — causation evidence matters more.",x:"ISO HO 00 02"},
+{s:1,t:"HO limits",q:"On an HO-3, Coverage B (Other Structures) is normally:",o:["5% of Coverage A","10% of Coverage A","20% of Coverage A","50% of Coverage A"],a:1,w:"Other structures (detached garage, fence, shed) = 10% of A.",i:"Fences and sheds hit by hail come out of B — check whether B has room before you scope them.",k:"C = 50% of A; D (HO-3) = 30% of A.",x:"ISO HO 00 03",nt:1,fix:1},
+{s:1,t:"HO limits",q:"On an HO-3, Coverage C (Personal Property) is normally:",o:["10% of A","30% of A","50% of A","100% of A"],a:2,w:"Personal property defaults to 50% of the dwelling limit.",i:"Contents inventories can be large — the 50% default is often the ceiling you're working toward.",k:"B = 10%; D = 30%.",x:"ISO HO 00 03",nt:1,fix:1},
+{s:1,t:"HO limits",q:"On an HO-3, Coverage D (Loss of Use) is normally:",o:["10% of A","20% of A","30% of A","50% of A"],a:2,w:"Loss of use = 30% of A on HO-3 (additional living expense + fair rental value).",i:"ALE is the money a displaced family lives on — PAs often recover it late or not at all.",k:"B 10% · C 50% · D 30%.",x:"ISO HO 00 03",nt:1,fix:1},
+{s:1,t:"HO limits",q:"Personal property away from the residence premises is covered up to:",o:["10% of Coverage C (or $1,000 if greater)","50% of Coverage C","100% of Coverage C","Not covered"],a:0,w:"Off-premises contents are limited to 10% of C or $1,000, whichever is greater.",i:"A storage unit or kid's dorm loss gets capped — tell the insured early.",x:"ISO HO 00 03"},
+{s:1,t:"HO limits",q:"Under HO-3 additional coverages, trees, shrubs, and plants are covered up to:",o:["5% of A, max $500 per tree","10% of A, no per-tree cap","$1,000 total","Not covered at all"],a:0,w:"Trees/shrubs/plants: 5% of Coverage A, no more than $500 per item, named perils only (no wind).",i:"Wind isn't a listed peril for trees — tree claims usually come in through debris removal instead.",x:"ISO HO 00 03",nt:1},
+{s:1,t:"HO limits",q:"An HO-3 limits theft of jewelry, watches, and furs to:",o:["$200","$1,500","$2,500","No limit"],a:1,w:"Special limit: $1,500 for theft of jewelry/watches/furs.",i:"High-value jewelry needs a scheduled floater — the base policy barely touches it.",k:"Money $200 · firearms & silverware theft $2,500.",x:"ISO HO 00 03 (2011)",nt:1,fix:1},
+{s:1,t:"HO limits",q:"An HO-3 special limit for money, bank notes, and coins is:",o:["$200","$500","$1,500","$2,500"],a:0,w:"Money: $200. Securities and valuable papers: $1,500.",i:"Cash is the easiest item to fake, so the policy barely covers it.",k:"Jewelry theft $1,500.",x:"ISO HO 00 03",nt:1,fix:1},
+{s:1,t:"HO limits",q:"Fire department service charges under an HO-3 additional coverage are paid up to:",o:["$250","$500","$1,000","Unlimited"],a:1,w:"Fire department service charge: up to $500, no deductible.",i:"Small, but it's money the insured is owed and rarely asks for.",x:"ISO HO 00 03",nt:1,fix:1},
+{s:1,t:"HO limits",q:"Under the HO-3, debris removal gets extra coverage of:",o:["Nothing extra","5% of the limit that applies to the damaged property","10% of Coverage A","$500 flat"],a:1,w:"If the loss + debris removal exceeds the limit, an extra 5% of that limit is available for debris.",i:"On a total-loss roof or burned home, that 5% can be thousands — don't leave it.",x:"ISO HO 00 03"},
+{s:1,t:"HO limits",q:"Reasonable repairs (tarping, boarding up) after a covered loss are:",o:["The insured's own cost","Covered, and don't increase the limit of liability","Covered only if pre-approved","Only covered on HO-5"],a:1,w:"Reasonable repairs to protect from further damage are paid as part of the claim.",i:"This is also a DUTY — failing to protect the property can cost the insured coverage for later damage.",x:"ISO HO 00 03"},
+{s:1,t:"HO conditions",q:"On an HO policy, vandalism and glass breakage are excluded once the dwelling has been vacant more than:",o:["30 consecutive days","60 consecutive days","90 consecutive days","6 months"],a:1,w:"Vacant 60+ consecutive days → vandalism (and glass) coverage drops.",i:"Estates and flips are often vacant — check dates before you sign the claim.",k:"Proof of loss is also 60 days. Different rule, same number.",x:"ISO HO / SFP",nt:1,fix:1},
+{s:1,t:"HO conditions",q:"Vacant vs. unoccupied:",o:["They mean the same","Vacant = no contents and no people; unoccupied = contents but no one living there","Unoccupied = no contents","Vacant = owner traveling"],a:1,w:"Vacant = empty of people AND property. Unoccupied = furnished, nobody home.",i:"Carriers try to call an unoccupied home 'vacant' to trigger the restriction. Know the difference.",x:"Definitions"},
+{s:1,t:"DP forms",q:"Dwelling policies (DP forms) are used for:",o:["Owner-occupied homes only","Rentals, vacant, seasonal, or homes that don't qualify for HO","Commercial buildings","Condos"],a:1,w:"DP forms cover dwellings that don't fit HO — especially landlord rentals.",i:"Landlord clients bring DP policies. No personal liability built in, and different perils.",x:"ISO DP forms"},
+{s:1,t:"DP forms",q:"Which DP form is the most restrictive and pays ACV?",o:["DP-1 Basic","DP-2 Broad","DP-3 Special","DP-4"],a:0,w:"DP-1: basic named perils, ACV.",i:"On a DP-1 the insured gets depreciated value — set expectations before you take the job.",k:"DP-3 is the HO-3 look-alike: open perils on the dwelling.",x:"ISO DP forms",fix:1},
+{s:1,t:"DP forms",q:"Which dwelling form is most like an HO-3?",o:["DP-1","DP-2","DP-3","HO-8"],a:2,w:"DP-3 Special: open perils on the dwelling, named perils on contents, RCV on the building.",i:"Same burden-of-proof logic as an HO-3 — the carrier must prove the exclusion.",x:"ISO DP 00 03",fix:1},
+{s:1,t:"Standard Fire Policy",q:"Under the NY Standard Fire Policy, the insured must file a sworn proof of loss within:",o:["30 days","60 days","90 days","12 months"],a:1,w:"Sworn proof of loss: within 60 days after the loss (unless extended in writing).",i:"Miss it and the carrier has a technical denial. Calendar it the day you sign.",k:"Suit = 12 months. Vacancy = 60 days. Mortgagee notice = 10 days.",x:"NY SFP lines 90-122",nt:1,fix:1},
+{s:1,t:"Standard Fire Policy",q:"Under the Standard Fire Policy, suit must be filed within:",o:["60 days of loss","6 months","12 months after the loss","2 years"],a:2,w:"Suit limitation: 12 months after inception of the loss.",i:"In Illinois this clock is tolled from proof of loss until denial (215 ILCS 5/143.1). Huge on slow claims.",k:"Proof of loss = 60 days.",x:"NY SFP; 215 ILCS 5/143.1",nt:1,fix:1},
+{s:1,t:"Standard Fire Policy",q:"Illinois tolls (pauses) the policy's suit-limitation period:",o:["Never","From proof of loss filing until the insurer denies in whole or part","Only during appraisal","For 30 days after any partial payment"],a:1,w:"215 ILCS 5/143.1: the period stops running from proof of loss until written denial.",i:"Denial letters must tell the insured how many days are left (919.80(d)(8)(C)). Check that line.",x:"215 ILCS 5/143.1; 50 IAC 919.80"},
+{s:1,t:"Standard Fire Policy",q:"The 1943 NY Standard Fire Policy did NOT establish:",o:["The appraisal procedure","The 60-day proof of loss","The 12-month suit limit","Flood coverage"],a:3,w:"The SFP covers fire and lightning; flood is excluded from standard policies — NFIP covers it.",i:"Never stretch a policy to cover flood. Point the insured to NFIP.",x:"NY SFP",fix:1},
+{s:1,t:"Standard Fire Policy",q:"The basic perils insured by the Standard Fire Policy are:",o:["All risks","Fire, lightning, and removal from premises","Fire and flood","Fire, wind, and hail"],a:1,w:"SFP insures direct loss by fire, lightning, and removal (property moved to protect it).",i:"Every other peril on modern forms is added on top of this 1943 base contract.",x:"NY SFP"},
+{s:1,t:"Standard Fire Policy",q:"Under the SFP, the insurer must pay within how long after proof of loss and ascertainment of the loss?",o:["15 days","30 days","60 days","90 days"],a:2,w:"Amount payable 60 days after proof of loss is received and the loss is determined.",i:"After that, delay arguments shift toward the carrier — and Illinois Part 919 clocks apply too.",k:"Proof of loss is ALSO 60 days. Two different 60s.",x:"NY SFP",nt:1,fix:1},
+{s:1,t:"NFIP",q:"New NFIP flood policies usually have a waiting period of:",o:["None","10 days","30 days","60 days"],a:2,w:"30-day waiting period before a new flood policy takes effect (with limited exceptions).",i:"Stops people buying flood insurance when the rain's already coming — adverse selection.",k:"Address change = 30 days too. Different topic, same number.",x:"NFIP",nt:1,fix:1},
+{s:1,t:"NFIP",q:"Maximum NFIP coverage for a residential building / contents:",o:["$100K / $50K","$250K / $100K","$500K / $250K","$250K / $250K"],a:1,w:"Residential: $250,000 building, $100,000 contents.",i:"High-value homes need excess flood — the NFIP cap leaves a gap.",x:"NFIP SFIP",nt:1},
+{s:1,t:"NFIP",q:"NFIP Increased Cost of Compliance (ICC) pays up to:",o:["$10,000","$30,000","$50,000","$100,000"],a:1,w:"ICC: up to $30,000 to bring a substantially damaged building up to floodplain rules.",i:"Elevation and code-required rebuilds are expensive — ICC is separate money most insureds miss.",x:"NFIP SFIP",nt:1,fix:1},
+{s:1,t:"NFIP",q:"Write-Your-Own (WYO) flood policies are:",o:["Private flood insurance outside NFIP","NFIP policies sold and serviced by private insurers","Self-insurance","State FAIR Plan policies"],a:1,w:"WYO companies issue and service NFIP policies; FEMA carries the risk.",i:"The logo on the policy may be a private carrier, but NFIP rules govern the claim.",x:"NFIP"},
+{s:1,t:"Mine subsidence",q:"Which is FALSE about Illinois mine subsidence?",o:["It's handled through the Illinois Mine Subsidence Insurance Fund","It's treated as a type of earth movement under standard policies","It covers damage from collapse of underground mines","Coverage is tied to the property policy in Illinois"],a:1,w:"Mine subsidence is NOT 'earth movement' — it has its own coverage in Illinois.",i:"Cracked foundations in mining counties: check for subsidence coverage before accepting an earth-movement denial.",x:"IL Mine Subsidence Insurance Fund",fix:1},
+{s:1,t:"Commercial",q:"Which causes-of-loss form gives open-perils coverage for commercial property?",o:["Basic","Broad","Special","Named"],a:2,w:"Special form = open perils. Basic and Broad are named perils.",i:"Same burden flip as an HO-3: on Special, the carrier proves the exclusion.",k:"Broad adds falling objects, weight of snow/ice, water damage to Basic.",x:"ISO CP 10 30",fix:1},
+{s:1,t:"Commercial",q:"Broad form causes of loss adds which of these to Basic?",o:["Flood","Falling objects, weight of snow/ice/sleet, water damage","Earthquake","Theft"],a:1,w:"Broad = Basic + falling objects, weight of snow/ice/sleet, water damage (and collapse additional coverage).",i:"Ice-dam and snow-load claims live or die on whether the form includes weight of snow/ice.",x:"ISO CP 10 20"},
+{s:1,t:"Commercial",q:"Under commercial property forms, if a building is vacant more than 60 consecutive days, vandalism and sprinkler leakage are:",o:["Still covered in full","Not covered; other covered losses are reduced 15%","Covered at 50%","Covered only with notice"],a:1,w:"Vacancy 60+ days: no coverage for vandalism, sprinkler leakage, glass, water damage, theft; other losses cut 15%.",i:"Vacant commercial properties are a trap — run the dates before you promise anything.",x:"ISO CP 00 10 vacancy",nt:1},
+{s:1,t:"Commercial",q:"Business Income coverage (CP 00 30) generally starts after a waiting period of:",o:["24 hours","72 hours","7 days","30 days"],a:1,w:"Business income has a 72-hour waiting period on the 2012+ forms (extra expense starts right away).",i:"Lost income claims are big money for commercial clients — and often under-claimed.",x:"ISO CP 00 30",nt:1,fix:1},
+{s:1,t:"Commercial",q:"A Business Owners Policy (BOP) is:",o:["Commercial auto","A package for small/mid businesses combining property and liability","Workers' comp","Only for contractors"],a:1,w:"BOP bundles property, business income, and liability for eligible small businesses.",i:"Many storefront claims you'll see are BOPs — business income is often included automatically.",x:"ISO BP forms"},
+{s:1,t:"Commercial",q:"Builders risk insurance covers:",o:["Finished occupied buildings","Buildings under construction","Contractor's tools only","Liability to workers"],a:1,w:"Builders risk covers a building during construction, as its value grows.",i:"Storm damage to a home mid-build goes to builders risk, not the owner's HO.",x:"ISO CP 00 20"},
+{s:1,t:"Commercial",q:"Ordinance or Law coverage pays for:",o:["Fines for code violations","Costs from enforcing building codes after a loss (undamaged portion, demolition, increased construction cost)","Legal defense","Permit fees only"],a:1,w:"Coverage A: loss of undamaged part · B: demolition · C: increased cost of construction.",i:"Code upgrades (like ice barrier or decking) are where real claim dollars hide.",x:"ISO CP 04 05"},
+{s:1,t:"Commercial",q:"Equipment breakdown coverage is designed for:",o:["Wear and tear","Sudden mechanical or electrical breakdown of equipment (boilers, HVAC, electrical)","Theft of equipment","Flood damage"],a:1,w:"Covers sudden, accidental breakdown — which property forms usually exclude.",i:"A fried HVAC after a power surge may belong here instead of the main property form.",x:"Equipment breakdown"},
+{s:1,t:"Inland marine",q:"Inland marine insurance generally covers:",o:["Ships at sea","Property in transit or movable property, and some fixed transportation property (bridges, towers)","Only boats on lakes","Homes near water"],a:1,w:"Inland marine = movable property, goods in transit, and instrumentalities of transportation.",i:"Contractor equipment, signs, and scheduled jewelry all live here — not in the property form.",k:"Ocean marine = vessels and cargo at sea.",x:"Nationwide Marine Definition"},
+{s:1,t:"Inland marine",q:"A personal articles floater on jewelry typically pays on what basis?",o:["ACV","Agreed or scheduled value, open perils","Named perils ACV","Market value at sale"],a:1,w:"Scheduled items: open perils, agreed/scheduled value.",i:"That's why high-value items should be scheduled — the base HO caps jewelry theft at $1,500.",x:"Personal articles floater"},
+{s:1,t:"Inland marine",q:"A sign floater: $20,000 limit, 5% deductible of the limit, $10,000 covered loss. Payment?",o:["$9,500","$9,000","$10,000","$19,000"],a:1,w:"Deductible = 5% × $20,000 = $1,000. $10,000 − $1,000 = $9,000.",i:"Percentage deductibles compute on the LIMIT (or value), not the loss — a common trick.",x:"Percentage deductibles"},
+{s:1,t:"Bonds",q:"A surety bond involves which three parties?",o:["Insurer, insured, adjuster","Principal, obligee, surety","Employer, employee, insurer","Buyer, seller, bank"],a:1,w:"Principal (who promises), obligee (who's protected), surety (who guarantees).",i:"Your $50,000 PA bond: you're the principal, Illinois/the public is the obligee.",k:"Fidelity bond = covers employee dishonesty.",x:"Surety"},
+{s:1,t:"Bonds",q:"How is a surety bond different from insurance?",o:["It isn't","The principal must repay the surety for any claim paid","The surety never pays","Only the obligee pays premium"],a:1,w:"Surety expects zero losses: if it pays a claim, it comes after the principal for reimbursement.",i:"A claim on your PA bond is a debt you owe — not a free payout.",x:"Surety"},
+{s:1,t:"Bonds",q:"A fidelity bond protects an employer against:",o:["Customer injuries","Employee dishonesty or theft","Contractor failure","Fire"],a:1,w:"Fidelity = employee crime (embezzlement, theft).",i:"Fidelity sounds like 'faithful' — it covers when an employee isn't.",x:"Fidelity"},
+{s:1,t:"IL market",q:"The Illinois FAIR Plan provides:",o:["Free insurance for low-income homeowners","Basic property insurance for people who can't get it in the normal market","Flood insurance","Health coverage"],a:1,w:"FAIR = Fair Access to Insurance Requirements; a market of last resort.",i:"FAIR Plan policies are bare-bones — read the form before you assume HO-3 coverage.",x:"Illinois FAIR Plan"},
+{s:1,t:"IL market",q:"The Illinois Insurance Guaranty Fund:",o:["Guarantees every claim gets paid in full","Pays covered claims when a member insurer becomes insolvent","Funds PA bonds","Insures the state's buildings"],a:1,w:"Steps in when an insurer goes insolvent, up to statutory limits.",i:"If your client's carrier collapses mid-claim, the claim moves to the Fund — it doesn't vanish.",x:"IL Insurance Guaranty Fund"},
+{s:1,t:"Water & mold",q:"A burst pipe floods the kitchen. Under an HO-3 this is generally:",o:["Excluded as flood","Covered as sudden and accidental discharge of water","Excluded as wear and tear","Covered only under NFIP"],a:1,w:"Sudden and accidental discharge from plumbing is covered; surface water flood is not.",i:"'Flood' means surface water from outside. Calling an interior burst a flood is a misread you can push back on.",k:"Repeated seepage over 14+ days is usually excluded.",x:"ISO HO 00 03"},
+{s:1,t:"Water & mold",q:"Wind-driven rain damages the interior of a home. It's typically covered only if:",o:["Always covered","Wind first created an opening in the roof or walls","The rain lasted over 24 hours","The insured has flood coverage"],a:1,w:"Interior rain damage needs a wind-made opening first.",i:"Document the opening — photos of the lifted shingle or blown-out window win this one.",x:"ISO HO named perils (windstorm)"},
+// ───────── SECTION II · TERMS & CONCEPTS (25%) ─────────
+{s:2,t:"Indemnity",q:"The principle of indemnity means:",o:["The insured profits from a loss","The insured is restored to pre-loss condition — no better, no worse","The insurer pays the policy limit","Premiums are refunded"],a:1,w:"Indemnity restores, it doesn't reward.",i:"Every carrier argument about 'betterment' comes from this principle.",x:"Indemnity"},
+{s:2,t:"Indemnity",q:"A $50,000 loss on a property insured for $75,000 pays (no deductible, no coinsurance issue):",o:["$75,000","$50,000","$25,000","$62,500"],a:1,w:"Lesser of the actual loss or the limit.",i:"Over-insuring doesn't pay more — and it signals moral hazard.",x:"Indemnity"},
+{s:2,t:"Indemnity",q:"Which are EXCEPTIONS to strict indemnity?",o:["Subrogation and contribution","Replacement cost coverage and valued policies","Deductibles","Named perils"],a:1,w:"RCV and valued policies can pay more than depreciated pre-loss value.",i:"RCV is the exception you fight for every day.",x:"Indemnity"},
+{s:2,t:"Valuation",q:"Illinois defines Actual Cash Value (residential, for claims rules) as:",o:["Market value","Replacement cost at time of loss minus depreciation, if any","Purchase price minus deductible","Assessed tax value"],a:1,w:"ACV = RC − depreciation. The insurer must give the depreciation worksheet on request.",i:"Ask for the worksheet every time — age, condition, and life expectancy must be shown.",x:"50 IAC 919.80(d)(8)(A)"},
+{s:2,t:"Valuation",q:"Replacement cost $280,000, ACV $200,000. Depreciation is:",o:["$80,000","$200,000","$280,000","$480,000"],a:0,w:"Depreciation = RC − ACV = $80,000.",i:"Under RCV, that $80,000 is usually recoverable once repairs are done.",x:"ACV formula"},
+{s:2,t:"Valuation",q:"Under replacement cost coverage, the insured typically receives:",o:["Full RCV up front","ACV first; depreciation is recoverable after repairs are completed","Depreciation only","Market value"],a:1,w:"ACV check first, recoverable depreciation released after repair/replacement.",i:"Track recoverable depreciation — it's the most-forgotten check on a claim.",x:"RCV loss settlement"},
+{s:2,t:"Valuation",q:"Obsolescence is a loss in value caused by:",o:["Physical wear","Becoming outdated (design, technology, codes)","Fire","Theft"],a:1,w:"Obsolescence = value lost to being outdated, not to wear.",i:"Discontinued shingles: matching arguments start here.",x:"Valuation"},
+{s:2,t:"Insurable interest",q:"For property insurance, insurable interest must exist:",o:["At policy inception","At the time of loss","At both","At renewal"],a:1,w:"Property: at time of loss. Life: at inception.",i:"Sold the house before the storm? No interest at loss = no claim.",x:"Insurable interest",fix:1},
+{s:2,t:"Insurable interest",q:"Which does NOT create an insurable interest in property?",o:["Ownership","Being a mortgage lender","Being a tenant with improvements","Being a neighbor who likes the house"],a:3,w:"Insurable interest = a financial stake (ownership, secured creditor, lease, liability).",i:"Mortgagees have interest — that's why they're on the check.",x:"Insurable interest",fix:1},
+{s:2,t:"Causation",q:"Proximate cause is:",o:["The last event before the loss","The unbroken chain of events that starts with a peril and ends in the loss","The insured's negligence","The most expensive damage"],a:1,w:"Proximate cause = the efficient cause that sets the unbroken chain in motion.",i:"This is your causal-chain logic: wind → opening → rain → interior. Prove each link.",x:"Proximate cause"},
+{s:2,t:"Causation",q:"Wind lifts shingles; rain then soaks the attic. The interior water damage is:",o:["A direct loss","An indirect (consequential) loss","Excluded always","A liability loss"],a:1,w:"Direct = the peril's physical damage (shingles). Indirect = what results from it (interior water, ALE).",i:"Indirect losses still get paid if the chain starts with a covered peril.",x:"Direct vs indirect"},
+{s:2,t:"Subrogation",q:"The insurer's right to recover from a negligent third party after paying the insured:",o:["Contribution","Indemnification","Subrogation","Estoppel"],a:2,w:"Subrogation: the insurer steps into the insured's shoes.",i:"'Sub' (under) + 'rogare' (to ask) — the insurer asks in place of the insured.",x:"Subrogation"},
+{s:2,t:"Subrogation",q:"An insured signs a release with the at-fault party before the insurer recovers. This:",o:["Is the insured's right","Impairs the insurer's subrogation rights and can jeopardize the claim","Triggers estoppel","Waives the deductible"],a:1,w:"The insured must not do anything after a loss that impairs subrogation.",i:"Tell clients: sign nothing from the other side without checking first.",x:"Subrogation"},
+{s:2,t:"Waiver & estoppel",q:"Waiver is:",o:["A court-imposed bar","The voluntary giving up of a known right","Hiding a material fact","A policy endorsement"],a:1,w:"Waiver = knowingly giving up a right.",i:"If the carrier keeps handling a claim after learning of a violation, argue waiver.",k:"Estoppel = can't contradict earlier conduct someone relied on.",x:"Waiver"},
+{s:2,t:"Waiver & estoppel",q:"Estoppel prevents a party from:",o:["Filing suit","Asserting a right that contradicts its earlier conduct that someone reasonably relied on","Hiring a PA","Cancelling a policy"],a:1,w:"Estoppel is imposed when one side relied on the other's conduct.",i:"Adjuster said 'go ahead and tear off' then denied? Reliance → estoppel argument.",k:"Waiver is voluntary; estoppel is imposed.",x:"Estoppel"},
+{s:2,t:"Waiver & estoppel",q:"A non-waiver agreement or reservation of rights letter exists to:",o:["Speed up payment","Let the insurer investigate without waiving its right to deny","Force appraisal","Extend deadlines"],a:1,w:"It preserves the insurer's coverage defenses during investigation.",i:"When you see one, the carrier is building a denial — tighten your documentation.",x:"Waiver"},
+{s:2,t:"Good faith",q:"Intentionally failing to disclose a material fact is:",o:["A representation","Concealment — can void coverage","A warranty","Twisting"],a:1,w:"Concealment of a material fact can void the policy.",i:"Fiduciary duty means you never help a client hide facts — it can kill the whole claim.",x:"Utmost good faith"},
+{s:2,t:"Good faith",q:"A representation on an insurance application must be:",o:["Literally true in every detail","Substantially true to the best of the applicant's knowledge","Notarized","Repeated at renewal"],a:1,w:"Representations: substantially true. Warranties: literally true.",i:"In Illinois a misstatement voids coverage only if made with intent to deceive or it materially affected the risk (215 ILCS 5/154).",x:"215 ILCS 5/154"},
+{s:2,t:"Hazards",q:"An insured who doesn't lock doors because 'insurance will pay' shows:",o:["Moral hazard","Morale hazard","Physical hazard","Legal hazard"],a:1,w:"Morale = carelessness because insured. Moral = dishonesty/intent.",i:"Carriers use 'moral hazard' language to imply fraud — know which one they actually mean.",x:"Hazards"},
+{s:2,t:"Hazards",q:"An insured who sets their own building on fire is an example of:",o:["Morale hazard","Moral hazard","Physical hazard","Peril"],a:1,w:"Moral hazard = character: dishonesty, intent to defraud.",i:"Moral → morals (character). Morale → attitude (careless).",x:"Hazards"},
+{s:2,t:"Hazards",q:"Peril vs. hazard:",o:["Same thing","Peril = cause of loss (fire); hazard = condition that increases chance of loss","Hazard = cause of loss","Peril = deductible"],a:1,w:"Peril causes the loss; hazard makes it more likely or worse.",i:"Coverage questions turn on the peril. Underwriting cares about hazards.",x:"Terms"},
+{s:2,t:"Coinsurance",q:"Coinsurance payment formula:",o:["Loss × limit","(Amount carried ÷ amount required) × loss − deductible","Limit − loss","Loss ÷ value"],a:1,w:"Did ÷ Should × Loss. Required = value × coinsurance %.",i:"Memorize: 'Did over Should times Loss.' The exam WILL have one.",x:"Coinsurance"},
+{s:2,t:"Coinsurance",q:"Building $500,000, 80% coinsurance, carries $300,000, $100,000 loss. Insurer pays (ignore deductible):",o:["$100,000","$75,000","$60,000","$80,000"],a:1,w:"Required = $400,000. ($300K ÷ $400K) × $100K = $75,000.",i:"The insured eats $25,000 for being underinsured.",x:"Coinsurance"},
+{s:2,t:"Coinsurance",q:"Building $1,000,000, 80% coinsurance, carries $500,000, $200,000 loss. Payment (ignore deductible)?",o:["$200,000","$160,000","$125,000","$100,000"],a:2,w:"Required $800K. ($500K ÷ $800K) × $200K = $125,000.",i:"Same formula every time — set up the fraction first.",x:"Coinsurance"},
+{s:2,t:"Coinsurance",q:"Building $200,000, 80% coinsurance, carries $160,000, $40,000 loss. Payment (ignore deductible)?",o:["$30,000","$32,000","$40,000","$20,000"],a:2,w:"Required $160K. Carried $160K. No penalty → $40,000.",i:"Meeting the requirement exactly = no penalty. Check this before you do any math.",x:"Coinsurance"},
+{s:2,t:"Deductibles",q:"A 2% wind deductible on a dwelling insured for $300,000 is:",o:["2% of the loss","$6,000 — calculated on the insured value","$3,000","$600"],a:1,w:"Percentage deductibles are on the dwelling limit, not the loss.",i:"Homeowners are often shocked — explain it early so they don't blame you.",x:"Deductibles"},
+{s:2,t:"Deductibles",q:"A franchise deductible means:",o:["A flat amount always applies","Below the threshold nothing is paid; above it the ENTIRE loss is paid","It doubles each claim","Only commercial use"],a:1,w:"All-or-nothing threshold.",i:"Opposite of a normal deductible, which is always subtracted.",x:"Deductibles"},
+{s:2,t:"Other insurance",q:"Two policies: $100K and $300K limits. $80K loss. Pro rata, the $100K policy pays:",o:["$40,000","$20,000","$26,667","$80,000"],a:1,w:"(Its limit ÷ total limits) × loss = (100 ÷ 400) × 80K = $20,000.",i:"Same fraction logic as coinsurance — share of total limits.",x:"Pro rata liability"},
+{s:2,t:"Other insurance",q:"Gold $100K limit, Silver $50K limit, $60K loss. Pro rata, Gold pays:",o:["$60,000","$40,000","$30,000","$20,000"],a:1,w:"(100 ÷ 150) × 60K = $40,000. Silver pays $20,000.",i:"Check your answer: the two shares must add up to the loss.",x:"Pro rata liability"},
+{s:2,t:"Other insurance",q:"Contribution by equal shares means each insurer:",o:["Pays by limit proportion","Pays equally until its limit is used up, then the others continue","Pays nothing","Pays the full loss"],a:1,w:"Equal shares: split evenly until the smallest limit runs out.",i:"Different from pro rata — read which method the policy uses.",x:"Other insurance"},
+{s:2,t:"Terms",q:"A binder is:",o:["The final policy","Temporary evidence of coverage until the policy is issued","A claim form","A release"],a:1,w:"Binder = immediate temporary coverage.",i:"Storm hit right after purchase? A binder may be the proof of coverage.",x:"Terms"},
+{s:2,t:"Terms",q:"Bailment is when:",o:["Property is abandoned","Personal property is temporarily in someone else's care (dry cleaner, repair shop)","Bail is posted","A mortgage is paid"],a:1,w:"The bailee has a duty of care for the owner's property.",i:"Contents damaged at a repair shop may be the shop's liability first.",x:"Bailment"},
+{s:2,t:"Terms",q:"Salvage is:",o:["Debris removal","Damaged property the insurer takes after paying for it, to reduce its loss","A PA fee","Recovered subrogation money"],a:1,w:"Insurer pays for the item, keeps and sells what's left.",i:"Illinois limits PAs here — you can't take a salvage interest without the client's written OK after settlement.",x:"Salvage"},
+{s:2,t:"Terms",q:"Limit of liability can be stated as:",o:["Only per occurrence","Per occurrence, aggregate, or per item","Only aggregate","Only per item"],a:1,w:"Limits can apply per occurrence, aggregate (per policy period), or per item/schedule.",i:"Multiple storms in one year? Aggregate limits matter.",x:"Terms"},
+{s:2,t:"Ethics terms",q:"Offering a fee discount tied to using the PA's preferred contractor is:",o:["Twisting","Churning","Prohibited in Illinois (fee variation / rebating-type inducement)","Fine with disclosure"],a:2,w:"Rule 3118.90 and Bulletin 2024-16 ban fee variations, waivers, or discounts tied to contractor choice.",i:"This is exactly the roofing-contractor PA model Illinois cracked down on in 2024.",x:"50 IAC 3118.90; CB 2024-16"},
+{s:2,t:"Ethics terms",q:"Mixing client funds with personal funds is:",o:["Conversion","Commingling","Subrogation","Contribution"],a:1,w:"Commingling = mixing. Taking the money = misappropriation (Class 4 felony).",i:"Separate escrow/trust account from day one of All Dire.",x:"215 ILCS 5/1580, 1610"},
+// ───────── SECTION III · POLICY PROVISIONS & CONTRACT LAW (5%) ─────────
+{s:3,t:"Contract law",q:"The four elements of a legal contract are:",o:["Offer, binder, premium, policy","Agreement (offer + acceptance), consideration, competent parties, legal purpose","Declarations, insuring agreement, conditions, exclusions","Notice, proof, payment, appraisal"],a:1,w:"Agreement, consideration, competent parties, legal purpose.",i:"Your PA contract needs all four too — plus Illinois's required terms.",k:"The policy's 4 PARTS = dec page, insuring agreement, conditions, exclusions.",x:"Contract law"},
+{s:3,t:"Contract law",q:"An insurance policy is a contract of adhesion, which means:",o:["Both sides negotiate every word","One side writes it, so ambiguities are read against the insurer","It's illegal","It can't be cancelled"],a:1,w:"The insurer drafts it; the insured takes it or leaves it → ambiguity goes against the drafter.",i:"Your best word-twisting defense: if the language is ambiguous, the insured's reading wins.",x:"Contract law"},
+{s:3,t:"Contract law",q:"Insurance is called aleatory because:",o:["Values exchanged may be unequal and depend on chance","Only one side makes promises","It's personal","It's conditional"],a:0,w:"Aleatory = depends on an uncertain event; small premium can buy a large payout.",i:"'Alea' is Latin for dice — insurance is a contract on a roll of the dice.",k:"Unilateral = only the insurer makes enforceable promises.",x:"Contract law"},
+{s:3,t:"Contract law",q:"The four main parts of a property policy are:",o:["Application, binder, rider, endorsement","Declarations, insuring agreement, conditions, exclusions","Premium, limit, deductible, term","Offer, acceptance, consideration, legality"],a:1,w:"DICE: Declarations, Insuring agreement, Conditions, Exclusions.",i:"When reading a denial, find which part the carrier is citing — then read that part yourself.",x:"Policy structure"},
+{s:3,t:"Provisions",q:"Under the mortgage clause, the lender's coverage:",o:["Falls with the homeowner's violations","Is independent — not voided by the homeowner's acts","Needs a separate policy","Covers contents"],a:1,w:"Mortgagee is protected even if the owner violates the policy; gets separate cancellation notice.",i:"That's why mortgage companies are on the checks — and why endorsement delays happen.",x:"Mortgage clause"},
+{s:3,t:"Provisions",q:"Can a property policy be assigned to someone else?",o:["Freely at any time","Not before a loss without insurer consent; claim proceeds after a loss can be assigned","Never","Only by the insurer"],a:1,w:"Pre-loss assignment needs consent; post-loss benefits can be assigned.",i:"Contractors take post-loss assignments (AOBs) — this is the rule behind them.",x:"Assignment"},
+{s:3,t:"Provisions",q:"The appraisal clause resolves disputes over:",o:["Coverage","The amount of loss","Bad faith","Premiums"],a:1,w:"Amount only. Each side picks an appraiser; they pick an umpire; any two agree = binding.",i:"Appraisal is your tool when the carrier agrees it's covered but lowballs the number.",k:"Appraisal is NOT arbitration — it never decides coverage.",x:"Appraisal"},
+{s:3,t:"Provisions",q:"An insured wants to abandon damaged property to the insurer and collect a total loss:",o:["Allowed with notice","Not allowed — the insurer decides how to settle","Allowed after 60 days","Allowed for vehicles"],a:1,w:"No abandonment: the insurer keeps the option to repair, rebuild, or pay.",i:"Clients often ask this. The answer is always no.",x:"Abandonment"},
+{s:3,t:"Provisions",q:"The liberalization clause means:",o:["Policies must be rewritten","Broadened coverage with no premium increase applies automatically to existing policies","Coverage changes at renewal only","An endorsement is required"],a:1,w:"Free improvements apply to current policies automatically.",i:"Check whether the carrier's newer form edition helps your client — it may apply.",x:"Liberalization"},
+{s:3,t:"Provisions",q:"Duties after a loss include all EXCEPT:",o:["Prompt notice and protecting the property","Preparing an inventory and showing the damage","Submitting to an EUO and producing records if required","Abandoning the property to the insurer"],a:3,w:"Abandonment is never a duty — it's prohibited.",i:"Missing a duty (like protecting the property) gives the carrier a defense — manage these for the client.",x:"Duties after loss",fix:1},
+{s:3,t:"Provisions",q:"One earring of a $5,000 pair is lost. The pair-and-set clause pays:",o:["$5,000","$2,500 automatically","The reduction in value or cost to replace the lost piece","Nothing"],a:2,w:"Pays the lost part's value or the drop in value — not the whole set.",i:"The same logic carriers use to fight full-roof matching — 'pair and set' thinking.",x:"Pair and set"},
+// ───────── SECTION IV · BUILDING & ESTIMATING (10%) ─────────
+{s:4,t:"Roofing",q:"One roofing 'square' equals:",o:["10 sq ft","100 sq ft","144 sq ft","1,000 sq ft"],a:1,w:"1 square = 100 square feet of roof surface.",i:"Every Xactimate roof line is priced in squares (SQ).",k:"Board foot = 144 cubic inches.",x:"Roofing",nt:1,fix:1},
+{s:4,t:"Roofing",q:"A truss may be notched or cut:",o:["If it's under 2 inches","Only with written approval from a licensed/certified engineer","If a contractor approves","Never under any circumstances"],a:1,w:"Trusses are engineered systems — any cut needs written engineer approval.",i:"Shows up often on the exam. The answer is always the engineer.",x:"Building techniques"},
+{s:4,t:"Roofing",q:"A gable roof is 32 ft long with rafters 16 in. on center. Rafters per side?",o:["24","25","32","50"],a:1,w:"32 ft = 384 in. ÷ 16 = 24 spaces. +1 = 25 rafters per side.",i:"Always +1 — the spaces are between rafters, and you need one at each end.",x:"Rafter count"},
+{s:4,t:"Roofing",q:"Roof pitch of 6/12 means:",o:["6 inches of run per 12 of rise","6 inches of rise per 12 inches of run","6 layers over 12 years","6 squares per 12 ft"],a:1,w:"Pitch = rise over run, in inches per 12.",i:"Steep pitch (usually 7/12+) adds steep charges in Xactimate — don't miss them.",x:"Roofing"},
+{s:4,t:"Roofing",q:"A hip roof differs from a gable roof because it:",o:["Has two slopes meeting at a ridge with vertical end walls","Slopes on all four sides","Is flat","Has two pitches on each side"],a:1,w:"Hip = slopes on all sides. Gable = two slopes with triangular end walls.",i:"Hips need more cutting → higher waste factor than gables.",k:"Gambrel = barn shape; mansard = four-sided gambrel.",x:"Roof types"},
+{s:4,t:"Roofing",q:"Typical shingle waste factor:",o:["0–2%","About 10% (gable) to 15% (hip/complex)","30–40%","50%"],a:1,w:"Add roughly 10–15% for cuts, starter, and ridge.",i:"Carriers often shave waste. A measured report + roof geometry justifies it.",x:"Estimating",nt:1},
+{s:4,t:"Hail",q:"Functional vs. cosmetic hail damage:",o:["Same thing","Functional = affects the roof's ability to shed water or its service life; cosmetic = appearance only","Cosmetic is always covered","Functional is always excluded"],a:1,w:"Functional damage (bruised mat, granule loss exposing mat, fractures) is the coverage fight.",i:"Many policies now exclude cosmetic damage on metal — read the endorsement before arguing.",x:"Damage assessment"},
+{s:4,t:"Electrical",q:"Watts equals:",o:["Volts ÷ amps","Volts × amps","Amps ÷ volts","Volts + amps"],a:1,w:"W = V × A.",i:"A 20-amp 120V circuit carries 2,400 watts.",x:"Electrical"},
+{s:4,t:"Electrical",q:"A standard 15-amp residential circuit uses what wire gauge?",o:["10 gauge","12 gauge","14 gauge","16 gauge"],a:2,w:"15 A → 14-gauge. 20 A → 12-gauge. Smaller number = thicker wire.",i:"Gauge goes backward: lower number, bigger wire, more amps.",x:"Electrical",nt:1,fix:1},
+{s:4,t:"Electrical",q:"GFCI protection is required in:",o:["Bedrooms only","Wet locations like kitchens, bathrooms, garages, and outdoors","Attics only","Nowhere in homes"],a:1,w:"GFCI = ground fault protection near water.",i:"Water-damage rebuilds can trigger code upgrades — ordinance or law money.",k:"AFCI = arc-fault, for bedrooms/living areas.",x:"NEC"},
+{s:4,t:"Electrical",q:"Standard residential voltage for outlets / large appliances:",o:["110 / 220 only","120V outlets / 240V large appliances","240 / 480","12 / 120"],a:1,w:"120V for general outlets; 240V for dryers, ranges, AC.",i:"Surge or lightning claims often name 240V appliances — know which circuit they're on.",x:"Electrical"},
+{s:4,t:"Water",q:"Category 3 water (IICRC S500) is:",o:["Clean water from a supply line","Gray water from a washer","Grossly contaminated 'black' water (sewage, rising flood water)","Steam"],a:2,w:"Cat 1 clean · Cat 2 gray · Cat 3 black.",i:"Cat 3 means porous materials (drywall, carpet, pad) get removed, not dried — bigger scope.",k:"Water CLASSES (1–4) measure how much is wet/evaporation load, not contamination.",x:"IICRC S500"},
+{s:4,t:"Water",q:"Clean water left sitting for days can become:",o:["Category 1 forever","Category 2 or 3 as it degrades","Steam","Excluded automatically"],a:1,w:"Categories degrade with time and contact with contaminants.",i:"Slow mitigation makes the loss bigger — and that's a carrier-delay argument.",x:"IICRC S500"},
+{s:4,t:"Estimating",q:"One board foot equals:",o:["1 in × 12 in × 12 in (144 cubic inches)","12 × 12 × 12 in","1 ft of any board","100 sq ft"],a:0,w:"Board foot = 144 cubic inches.",i:"Lumber pricing for framing repairs uses board feet.",k:"Square = 100 sq ft.",x:"Estimating",nt:1},
+{s:4,t:"Estimating",q:"A standard sheet of drywall (4×8) covers:",o:["16 sq ft","24 sq ft","32 sq ft","48 sq ft"],a:2,w:"4 × 8 = 32 sq ft.",i:"Quick check on whether a carrier's drywall quantity makes sense.",x:"Estimating",fix:1},
+{s:4,t:"Estimating",q:"Overhead and profit (O&P) is usually added when:",o:["Never","A general contractor is reasonably needed to coordinate multiple trades","Only on roofs","Only on commercial claims"],a:1,w:"Industry convention: 10% overhead + 10% profit when three or more trades need coordinating.",i:"Missing O&P is one of the most common underpayments you'll fight.",x:"Estimating"},
+{s:4,t:"Estimating",q:"A typical residential concrete foundation reaches design strength in about:",o:["24 hours","7 days","28 days","90 days"],a:2,w:"Standard design strength (~3,000 PSI residential) is measured at 28 days.",i:"Exam-style construction trivia. 28 days = design strength.",x:"Building",fix:1},
+{s:4,t:"Estimating",q:"R-value measures:",o:["Roof pitch","Insulation's resistance to heat flow — higher is better","Wire size","Water category"],a:1,w:"Higher R = better insulation.",i:"Wet insulation loses R-value — a reason to replace, not dry.",x:"Building"},
+// ───────── SECTION V · ILLINOIS LAW (25%) ─────────
+{s:5,t:"Scope & exemptions",q:"Illinois public adjusters handle:",o:["First-party AND third-party claims","First-party property claims only","Liability claims","Life and health claims"],a:1,w:"PAs act for insureds on first-party claims under property policies only.",i:"Never take a liability/third-party claim — it's outside the license.",x:"215 ILCS 5/1505, 1510"},
+{s:5,t:"Scope & exemptions",q:"Which person is EXEMPT from Illinois PA licensing?",o:["A contractor negotiating the claim for the owner","An Illinois attorney acting in professional capacity","A real estate agent negotiating the settlement","An independent adjuster hired by the insured"],a:1,w:"Five exemptions: attorneys, life/health/annuity, technical-assistance-only experts, health care providers filing forms, insurer-to-insurer subrogation.",i:"A contractor who negotiates the claim needs a PA license — that's the unlicensed-practice trap.",x:"215 ILCS 5/1515(d)"},
+{s:5,t:"Scope & exemptions",q:"A photographer hired only to document damage, who never negotiates:",o:["Needs a PA license","Is exempt — technical assistance only","Needs a producer license","Is exempt only under $10,000"],a:1,w:"Engineers, estimators, photographers, investigators who don't negotiate are exempt.",i:"You can hire experts — but under Bulletin 2024-16, YOU pay them, not the client.",x:"215 ILCS 5/1515(d)(3); CB 2024-16"},
+{s:5,t:"Scope & exemptions",q:"A contract made by an unlicensed person acting as a PA is:",o:["Voidable by the insurer","Valid if fees are reasonable","Void and invalid","Enforceable up to $5,000"],a:2,w:"Void and invalid.",i:"No license = no fee, no matter how good the work was.",x:"215 ILCS 5/1515(e)"},
+{s:5,t:"Scope & exemptions",q:"A business entity acting as a PA must:",o:["Have only one licensed person","Hold its own license and designate a licensed individual responsible for compliance","Register with the county only","Only have a bond"],a:1,w:"Entity license + designated licensed individual.",i:"All Dire needs its own entity license, with you as the designated licensee.",x:"215 ILCS 5/1515(c), 1525(b)"},
+{s:5,t:"Scope & exemptions",q:"Minimum age for an Illinois PA license?",o:["16","18","21","25"],a:1,w:"18.",x:"215 ILCS 5/1525(b)(1)",nt:1,fix:1},
+{s:5,t:"Licensing",q:"Illinois PA bond or irrevocable letter of credit minimum:",o:["$10,000","$20,000","$50,000","$100,000"],a:2,w:"$50,000 financial responsibility, uploaded with the application.",i:"The bond protects the public from you — it's a debt if a claim is paid on it.",x:"215 ILCS 5/1560; IDOI",nt:1,fix:1},
+{s:5,t:"Licensing",q:"Illinois PA license fee (resident), paid through NIPR:",o:["$92","$250","$500","$50"],a:1,w:"$250 license fee. ($92 is the EXAM fee.)",i:"Two different fees people mix up: exam $92, license $250.",k:"Exam fee $92 includes $50 state admin fee.",x:"IDOI; 215 ILCS 5/1563",nt:1,fix:1},
+{s:5,t:"Licensing",q:"The Illinois PA exam fee is:",o:["$50","$92","$250","$500"],a:1,w:"$92, which includes a $50 State of Illinois administrative fee.",k:"License = $250.",x:"IDOI / Pearson VUE",nt:1,fix:1},
+{s:5,t:"Licensing",q:"Continuing education per 2-year renewal cycle:",o:["12 hrs incl. 2 ethics","20 hrs incl. 4 ethics","24 hrs incl. 3 ethics","30 hrs incl. 5 ethics"],a:2,w:"24 hours, including 3 hours of ethics (classroom or webinar).",x:"215 ILCS 5/1565(a)",nt:1,fix:1},
+{s:5,t:"Licensing",q:"Before entering ANY PA contract with an insured, you need:",o:["Just the license","Just IDOI contract approval","BOTH the issued license AND the IDOI-approved contract form","A bond only"],a:2,w:"Two separate approvals; IDOI says don't contract until you have verification of both.",i:"Upload the bond and contract to NIPR with the application or it's rejected.",x:"IDOI; 50 IAC 3118.80"},
+{s:5,t:"Licensing",q:"Fingerprinting for an Illinois PA license:",o:["Optional","Required through an IL-approved live scan vendor; ISP and FBI results before licensing","Only for nonresidents","Only after a complaint"],a:1,w:"Required; no license until both background checks come back.",x:"IDOI; 215 ILCS 5/1520"},
+{s:5,t:"Licensing",q:"After failing the exam the first time, you can retake after:",o:["Immediately","7 days","30 days","90 days"],a:1,w:"7 days after the first fail; 30 days after the second or later.",x:"215 ILCS 5/1530; Pearson VUE",nt:1,fix:1},
+{s:5,t:"Licensing",q:"The IL PA exam passing score is:",o:["70% of questions correct","A scaled score of 70 — not a raw percentage","75 raw","80%"],a:1,w:"100 scored questions, 165 minutes, scaled passing score of 70.",i:"165 min ÷ 100 Qs ≈ 1.6 min each. Time isn't the enemy — rushing is.",x:"Pearson VUE handbook"},
+{s:5,t:"Licensing",q:"How long must a PA keep transaction records?",o:["3 years","5 years","At least 7 years after the transaction ends","10 years"],a:2,w:"7 years, open to Director examination at any time.",i:"Records must prove: fees came from the insured/insurer, were ≤10%, and mitigation matched paid amounts.",k:"Not 5 (revocation wait) — 7.",x:"215 ILCS 5/1585; CB 2024-16",nt:1,fix:1},
+{s:5,t:"Licensing",q:"A PA must notify the Director of an address change within:",o:["10 days","30 days","60 days","90 days"],a:1,w:"30 days.",k:"Another 30: reporting actions in other states. NFIP wait is also 30.",x:"Feb guide; 215 ILCS 5/1540",nt:1,fix:1,v:0},
+{s:5,t:"Licensing",q:"Nonresident Illinois PA license fee:",o:["$250 / 2 yrs","$350 / 2 yrs","$500 / 2 yrs","$500 / yr"],a:2,w:"$500 every 2 years (resident $250).",x:"215 ILCS 5/1563",nt:1,fix:1,v:0},
+{s:5,t:"Licensing",q:"A lapsed license may be reinstated within 12 months by paying:",o:["The standard fee","Double the unpaid renewal fee","A $1,000 penalty","Nothing — retake the exam"],a:1,w:"Within 12 months: double the unpaid renewal fee.",x:"215 ILCS 5/1545",v:0},
+{s:5,t:"Licensing",q:"A PA licensed in another state may skip the Illinois exam if licensed there for at least:",o:["6 months","12 months in good standing","24 months","5 years"],a:1,w:"12 months in good standing (with reciprocity).",x:"215 ILCS 5/1535",nt:1,fix:1,v:0},
+{s:5,t:"Fees",q:"Maximum PA fee on a personal residence claim in Illinois:",o:["10% — only during catastrophes","10% of the insurer's settlement payment, on any personal residence claim","15% with written consent","20% with Director approval"],a:1,w:"10% cap on personal residence claims — always.",i:"Personal residence = 1–4 family dwelling under a fire & EC policy, plus household contents.",x:"215 ILCS 5/1570(e); CB 2024-16"},
+{s:5,t:"Fees",q:"For non-residential property, the 10% fee cap applies:",o:["Always","Never","When the loss is from a catastrophic event, unless the Director approves more in writing","Only over $100,000"],a:2,w:"Catastrophic event → 10% cap unless the Director approves a higher fee.",x:"215 ILCS 5/1570(d)"},
+{s:5,t:"Fees",q:"The PA fee must be based on:",o:["Gross settlement including the deductible","Net claim payments by the insurer — excluding the deductible","The RCV estimate","The first check only"],a:1,w:"Fees can't include the deductible; only net claim payments count.",x:"50 IAC 3118.90(c)"},
+{s:5,t:"Fees",q:"On a personal residence claim, can a PA charge 10% PLUS travel and expert fees?",o:["Yes, any expenses","No — only policy-covered expenses like emergency mitigation can be reimbursed outside the cap","Yes, if disclosed","Only expert fees"],a:1,w:"Travel, lodging, meals, and expert fees can't be added. Experts are paid by the PA.",i:"Build your pricing knowing experts come out of YOUR 10%.",x:"CB 2024-16 §II.D"},
+{s:5,t:"Fees",q:"If the insurer pays or commits in writing to the policy limit within 5 business days after the loss is reported, the PA gets:",o:["The full percentage","Half","No commission — only reasonable compensation for services provided","Nothing at all"],a:2,w:"No percentage commission; only reasonable compensation for work done.",i:"Stops PAs from taking 10% of a claim the carrier was already paying in full.",k:"Same 5 business days as rescission and the copy-to-insurer email.",x:"215 ILCS 5/1575(c); 3118.80",nt:1},
+{s:5,t:"Contracts",q:"PA contract forms must be printed in no less than:",o:["8-point","10-point","12-point","14-point"],a:1,w:"10-point font; form number and edition in the lower LEFT corner.",x:"50 IAC 3118.80(c)",nt:1,fix:1},
+{s:5,t:"Contracts",q:"Before using a contract form, a PA must:",o:["Have an attorney review it","File it with IDOI and get approval","Register it with Pearson VUE","Notarize it"],a:1,w:"Contract forms are filed with and approved by IDOI before use.",x:"50 IAC 3118.80"},
+{s:5,t:"Contracts",q:"The insured may cancel a PA contract within:",o:["3 days of signing","5 business days after signing","5 business days after the insurance company receives the contract","10 calendar days of the loss"],a:2,w:"Voidable for 5 business days after the INSURER receives it (changed in 2024 — used to run from signing).",i:"The clock starts when you email the carrier — so email it fast and keep proof.",x:"215 ILCS 5/1575(j); CB 2024-16",nt:1},
+{s:5,t:"Contracts",q:"Valid ways for an insured to cancel a PA contract include all EXCEPT:",o:["Registered or certified mail, return receipt","Personal service","Email to the address in the contract","Text message"],a:3,w:"Certified/registered mail, personal service, or email. Not text.",x:"215 ILCS 5/1575; 3118.80(c)(15)",fix:1},
+{s:5,t:"Contracts",q:"If the insured cancels, the PA must return anything of value within:",o:["5 business days","10 business days","15 business days after receiving the notice","30 days"],a:2,w:"15 business days.",k:"5 business days = rescission window. 15 = refund.",x:"215 ILCS 5/1575(k)",nt:1,fix:1},
+{s:5,t:"Contracts",q:"Which is a PROHIBITED PA contract term?",o:["Naming the PA as co-payee","A power of attorney letting the PA act in place of the insured","Stating the exact percentage","Disclosing financial interests"],a:1,w:"No power of attorney. Co-payee is allowed (with exact % stated).",x:"215 ILCS 5/1575(e)(5)"},
+{s:5,t:"Contracts",q:"Which contract term is also prohibited?",o:["Collecting the entire fee from the first check","10-point font","An entire-agreement statement","A description of services"],a:0,w:"Fee must come as a percentage of each check — not all from the first, and not on money unpaid.",x:"215 ILCS 5/1575(e)(1)"},
+{s:5,t:"Contracts",q:"A contract may NOT require the insurer to:",o:["Send a copy of payments","Issue checks only in the PA's name","Include the mortgagee","Pay within 30 days"],a:1,w:"Checks can't be made only to the PA.",x:"215 ILCS 5/1575(e)(2)"},
+{s:5,t:"Contracts",q:"A hold-harmless clause protecting the PA from its own negligence is:",o:["Allowed with disclosure","Allowed if mutual","Prohibited","Required"],a:2,w:"Prohibited.",x:"215 ILCS 5/1575(e)(4)"},
+{s:5,t:"Contracts",q:"A contract term barring the insured from pursuing civil remedies is:",o:["Allowed","Prohibited","Required","Allowed for residential claims"],a:1,w:"Prohibited — the insured keeps their right to sue.",x:"215 ILCS 5/1575(e)(3)"},
+{s:5,t:"Contracts",q:"Before the contract is signed, the PA must give a separate disclosure explaining:",o:["The insurer's complaint history","The three types of adjusters — company, independent, public","The expected settlement","The PA's past claims"],a:1,w:"Plus: hiring a PA isn't required; the PA doesn't work for the insurer or IDOI; the fee is the insured's.",x:"215 ILCS 5/1575(f)"},
+{s:5,t:"Contracts",q:"After signing, the PA must email the insurer an exact copy of the contract within:",o:["24 hours","3 business days","5 business days","10 business days"],a:2,w:"5 business days.",i:"This email starts the client's 5-day cancel window. Send it the same day.",x:"215 ILCS 5/1575",nt:1,fix:1},
+{s:5,t:"Contractors",q:"Before recommending a contractor, an Illinois PA must confirm the contractor has:",o:["Two competing bids","Liability insurance, a performance bond, required licenses, and a written workmanship warranty","A Better Business Bureau rating","Worked with the PA before"],a:1,w:"Since April 30, 2024: confirm all four and document it in your records.",i:"The OLD rules (two bids, PA warrants workmanship) were REPEALED. Old study guides still teach them.",x:"50 IAC 3118.90; CB 2024-16 §I.B"},
+{s:5,t:"Contractors",q:"A client who uses a different contractor than the PA recommended:",o:["Can be charged more","Must sign a waiver","Can't be charged a higher fee","Voids the contract"],a:2,w:"No fee variation, waiver, or discount tied to contractor choice.",i:"And no promise that a contractor will 'cover' the PA fee.",x:"50 IAC 3118.90(a); CB 2024-16"},
+{s:5,t:"Contractors",q:"A PA contract may require the insured to use the PA's preferred contractor:",o:["Yes","No","Only for roofs","Only with disclosure"],a:1,w:"Prohibited.",x:"50 IAC 3118.90(b)"},
+{s:5,t:"Contractors",q:"Before the contract, a PA must disclose in writing:",o:["Nothing","Any direct or indirect financial interest in any party involved in the claim (e.g., a contractor)","Only ownership over 50%","Their tax returns"],a:1,w:"Includes shared ownership, investments, shared employees, referral fees, family interests.",x:"215 ILCS 5/1575(d), 1590; 3118.85"},
+{s:5,t:"Conduct",q:"The statutory standard: a PA serves with:",o:["Reasonable care","Objectivity and complete loyalty to the client's interests alone","Good faith to both sides","Courtesy"],a:1,w:"Exact phrase: objectivity and complete loyalty to the interests of the client alone.",x:"215 ILCS 5/1590(a)"},
+{s:5,t:"Conduct",q:"PA solicitation is prohibited between:",o:["6 p.m. – 9 a.m.","7 p.m. – 8 a.m.","8 p.m. – 8 a.m.","9 p.m. – 6 a.m."],a:1,w:"No soliciting 7:00 p.m. to 8:00 a.m.",i:"Door-knocking habit check: this is stricter than many roofing canvass schedules.",x:"215 ILCS 5/1590(b)",nt:1,fix:1},
+{s:5,t:"Conduct",q:"A PA may NOT solicit while:",o:["It's raining","The fire department is at the damaged premises or the loss is still happening","The insured is at work","An adjuster is inspecting"],a:1,w:"No soliciting during the occurrence or while fire crews are on scene.",x:"215 ILCS 5/1590(b)",v:0},
+{s:5,t:"Conduct",q:"A PA may take an interest in salvage only with:",o:["Verbal OK anytime","The insurer's approval","The insured's written permission obtained AFTER settlement","Director approval"],a:2,w:"Written permission, and only after settlement.",x:"215 ILCS 5/1590",v:0},
+{s:5,t:"Conduct",q:"A PA may advance money to an insured pending adjustment:",o:["Never","Up to $1,000","Only for emergency services","At 10% interest"],a:2,w:"No advances except for emergency services.",x:"215 ILCS 5/1590",v:0},
+{s:5,t:"Conduct",q:"A PA settles the claim without the insured's knowledge. This is:",o:["Fine if favorable","Prohibited — knowledge and consent are required","Allowed under power of attorney","Fine for small claims"],a:1,w:"Never settle without the insured's knowledge and consent.",x:"215 ILCS 5/1590"},
+{s:5,t:"Conduct",q:"A PA advising a client on their legal right to sue the insurer is:",o:["Part of the job","Unauthorized practice of law — prohibited","Fine with disclosure","Allowed after licensing"],a:1,w:"PAs can't give legal advice.",i:"You can say 'talk to an attorney' — not what the lawsuit would be.",x:"215 ILCS 5/1590"},
+{s:5,t:"Conduct",q:"A PA may take a claim outside their expertise:",o:["Yes, always","No — they must not accept claims beyond their competence","Only commercial","Only with a bond increase"],a:1,w:"Don't take claims you can't handle; you may hire experts (at your cost).",x:"215 ILCS 5/1590(j)(1); CB 2024-16"},
+{s:5,t:"Conduct",q:"Client funds held by a PA must go in:",o:["The PA's business account","An interest-bearing account, interest to the PA","A separate escrow/trust account at a federally insured institution","Any bank account"],a:2,w:"Separate escrow or trust account at an FDIC-insured institution.",x:"215 ILCS 5/1580",v:0},
+{s:5,t:"Penalties",q:"Acting as a PA without a license in Illinois is:",o:["Civil only","Class B misdemeanor","Class A misdemeanor","Class 4 felony"],a:2,w:"Class A misdemeanor.",k:"Misappropriating client money = Class 4 felony.",x:"215 ILCS 5/1610",fix:1},
+{s:5,t:"Penalties",q:"Misappropriating money collected as a PA is:",o:["Class A misdemeanor","Class 4 felony","Civil only","Fine only"],a:1,w:"Class 4 felony.",x:"215 ILCS 5/1610",fix:1},
+{s:5,t:"Penalties",q:"Maximum civil penalty per cause / total:",o:["$5K / $50K","$10K / $100K","$25K / $250K","$10K / unlimited"],a:1,w:"Up to $10,000 per cause, $100,000 total.",x:"215 ILCS 5/1555",nt:1,fix:1,v:0},
+{s:5,t:"Penalties",q:"After revocation, a PA may reapply after:",o:["1 year","3 years","5 years","Never"],a:2,w:"5 years.",k:"Records are kept 7 years — different number.",x:"215 ILCS 5/1555",nt:1,fix:1,v:0},
+{s:5,t:"Penalties",q:"A PA must report an administrative action taken in another state within:",o:["10 days","30 days of final disposition","60 days","At renewal"],a:1,w:"30 days after final disposition.",k:"Yet another 30-day rule.",x:"215 ILCS 5/1595",nt:1,fix:1,v:0},
+{s:5,t:"Part 919 claims",q:"Under Part 919, 'reasonable promptness' to respond to a communication is at most:",o:["10 working days","15 working days","21 working days","30 days"],a:1,w:"15 working days from receipt of communication.",i:"Unanswered emails past 15 working days = a documented 154.6 violation to cite.",k:"21 working days = begin investigation.",x:"50 IAC 919.40",nt:1,fix:1},
+{s:5,t:"Part 919 claims",q:"When liability is reasonably clear, the insurer must try to contact all insureds/claimants within:",o:["15 working days","21 working days after notification of loss","30 days","45 days"],a:1,w:"21 working days after notice of loss.",k:"15 = respond to communications.",x:"50 IAC 919.40",nt:1,fix:1},
+{s:5,t:"Part 919 claims",q:"Once liability is affirmed and the amount isn't disputed, the insurer must offer payment within:",o:["15 days","21 days","30 days","45 days"],a:2,w:"30 days after affirming liability.",x:"50 IAC 919.50",nt:1,fix:1},
+{s:5,t:"Part 919 claims",q:"A first-party denial or reduced settlement must be explained in writing within:",o:["15 working days","21 working days","30 days after investigation and liability determination","60 days"],a:2,w:"30 days after the investigation and determination are complete.",x:"50 IAC 919.50",nt:1},
+{s:5,t:"Part 919 claims",q:"A property claim unresolved more than ____ from report (or 25 days after proof of loss, whichever is less) requires a written delay explanation:",o:["30 days","40 days","60 days","75 calendar days"],a:3,w:"75 calendar days from report or 25 days after proof of loss — whichever is LESS. Notice must include the DOI availability notice.",i:"File proof of loss early: it can start the 25-day clock sooner than 75.",k:"40 days = median payment benchmark.",x:"50 IAC 919.80(d)(7)(B)",nt:1,fix:1},
+{s:5,t:"Part 919 claims",q:"Unreasonable delay exists for fire/EC claims when the median payment period exceeds:",o:["30 days","40 calendar days","60 days","75 days"],a:1,w:"40 calendar days.",x:"50 IAC 919.80(d)(7)(A)",nt:1,fix:1},
+{s:5,t:"Part 919 claims",q:"If the insured's estimate is higher than the carrier's on a partial loss, the carrier must:",o:["Ignore it","Respond promptly in writing and name a contractor who'll do it for its price — or agree to reimburse reasonable excess costs","Deny the claim","Demand appraisal"],a:1,w:"Name a contractor at their price, or pay the reasonable excess.",i:"One of the most useful rules you have: make them name the contractor.",x:"50 IAC 919.80(d)(7)(C)"},
+{s:5,t:"Part 919 claims",q:"Section 154.6 unfair claims practices are enforced by:",o:["Private policyholder lawsuits","The Director of Insurance (regulatory)","Class actions","County prosecutors"],a:1,w:"No private right of action; the Director enforces. Acts must be knowing or a general business practice.",i:"For the client's own lawsuit, the tool is Section 155, not 154.6.",x:"215 ILCS 5/154.5–154.6"},
+{s:5,t:"Part 919 claims",q:"Which is an unfair claims practice under § 154.6?",o:["Requesting documents","Inspecting before payment","Compelling insureds to sue by offering substantially less than amounts ultimately recovered","Denying a fraudulent claim"],a:2,w:"Also: misrepresenting facts or policy terms, not acknowledging promptly, not settling in good faith when liability is clear.",x:"215 ILCS 5/154.6"},
+{s:5,t:"Section 155",q:"Section 155 penalties require the insurer's delay or refusal to be:",o:["Negligent","Vexatious and unreasonable","Fraudulent","Criminal"],a:1,w:"Vexatious and unreasonable — attached to the insured winning the contract claim.",x:"215 ILCS 5/155"},
+{s:5,t:"Section 155",q:"The Section 155 penalty is capped at the LESSER of 60% of the amount owed, the excess over the pre-suit offer, or:",o:["$25,000","$50,000","$60,000","$100,000"],a:2,w:"$60,000 — plus reasonable attorney fees and costs.",x:"215 ILCS 5/155",nt:1,fix:1}
 ];
-// fix:1 = options are a fixed set (e.g. "all EXCEPT", "At both") or ordered — keep their order instead of shuffling.
 
-const KEY='pa-drill-stats';
-const CATS={law:"IL Law",claims:"Carrier Rules",concepts:"Concepts",product:"Policies"};
-const SHORT={law:"Law",claims:"Carrier",concepts:"Concepts",product:"Policies"};
+// ── Exam weights: in mixed modes, draws follow the real exam split, not the bank's size ──
+const EXAM={1:.35,2:.25,3:.05,4:.10,5:.25};
+const SEC={1:"Products",2:"Terms",3:"Contract",4:"Building",5:"IL Law"};
+const SECSHORT={1:"I PROD",2:"II TERMS",3:"III CONTR",4:"IV BLDG",5:"V IL LAW"};
+const BATCH=6;            // Learn mode: new facts in small batches
+const LOCK_MS=1000;       // answers unlock after 1s so the whole question gets read
+const RUSH_MS=3000;       // wrong answer faster than this after unlock = "rushed"
+const KEY='pa-drill-v5';
 const hasClaudeStore=!!(window.storage&&typeof window.storage.get==='function');
 const $=id=>document.getElementById(id);
 const el={qCat:$('qCat'),qSeen:$('qSeen'),qText:$('qText'),opts:$('opts'),exp:$('exp'),card:$('card'),nextBtn:$('nextBtn'),
-  today:$('sToday'),acc:$('sAcc'),weak:$('sWeak'),streak:$('streak'),mastery:$('mastery'),reset:$('resetBtn')};
+  today:$('sToday'),acc:$('sAcc'),weak:$('sWeak'),rush:$('sRush'),streak:$('streak'),mastery:$('mastery'),reset:$('resetBtn')};
+
+function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36);}
+Q.forEach(q=>{q.id=hash(q.q);});
+const secCount={};Q.forEach(q=>{secCount[q.s]=(secCount[q.s]||0)+1;});
 
 let S=fresh();
-let filter='all',cur=-1,answered=false,order=[],recent=[];
+let filter='all',cur=-1,answered=false,teaching=false,recent=[],unlockAt=0,lockTimer;
 
 function fresh(){return {q:{},today:{d:dkey(),n:0,c:0},streak:0};}
 function dkey(){const x=new Date();return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
-function stat(i){return S.q[i]||{c:0,w:0,s:0};}
+function stat(i){return S.q[Q[i].id]||{c:0,w:0,s:0,f:0,t:0};}
+const seen=t=>t.c+t.w;
 const isWeak=t=>t.w>0&&t.s<2;
+const mastered=t=>t.s>=2;
 
 async function load(){
   try{
@@ -246,9 +353,6 @@ async function load(){
     if(!raw)raw=localStorage.getItem(KEY);
     if(raw){const p=JSON.parse(raw);S={...fresh(),...p,today:{...fresh().today,...(p.today||{})},q:p.q||{}};}
   }catch(e){}
-  // older saves used an unpadded date key — accept it so today's count survives the update
-  const legacy=(()=>{const x=new Date();return x.getFullYear()+'-'+(x.getMonth()+1)+'-'+x.getDate();})();
-  if(S.today.d===legacy)S.today.d=dkey();
   if(S.today.d!==dkey())S.today={d:dkey(),n:0,c:0};
   $('bankN').textContent=Q.length;
   next();renderStats();
@@ -265,22 +369,42 @@ function save(){
 
 function weight(i){
   const t=stat(i);
-  if(t.c+t.w===0)return 3;              // unseen
-  if(t.s<0)return 4+Math.min(-t.s,3);   // wrong streak — hammer it
-  if(t.s>=3)return .3;                  // mastered
-  if(t.s>=1)return 1;
-  return 2;
+  let w;
+  if(!seen(t))w=3;
+  else if(t.s<0)w=4+Math.min(-t.s,3);
+  else if(t.s>=3)w=.3;
+  else if(t.s>=1)w=1;
+  else w=2;
+  if(t.f)w*=1.3;                                   // rushed misses come back a bit more
+  if(filter==='all'||filter==='weak'||filter==='traps')w*=EXAM[Q[i].s]/(secCount[Q[i].s]/Q.length);
+  return w;
 }
-function pick(){
-  let p=[];
+function learnPool(){
+  const p=[];
+  for(let i=0;i<Q.length&&p.length<BATCH;i++)if(!mastered(stat(i)))p.push(i);
+  return p;
+}
+function pool(){
+  if(filter==='learn')return learnPool();
+  const p=[];
   for(let i=0;i<Q.length;i++){
-    if(filter==='weak'?!isWeak(stat(i)):(filter!=='all'&&Q[i].c!==filter))continue;
+    const t=stat(i),q=Q[i];
+    if(filter==='weak'&&!isWeak(t))continue;
+    if(filter==='traps'&&!q.nt)continue;
+    if(filter[0]==='s'&&q.s!==+filter[1])continue;
     p.push(i);
   }
+  return p;
+}
+function pick(){
+  const p=pool();
   if(!p.length)return -1;
-  // avoid the last few questions so you don't see repeats back-to-back
-  const avoid=Math.min(recent.length,p.length-1);
-  const block=new Set(recent.slice(-avoid));
+  if(filter==='learn'){                            // teach unseen cards in order; then quiz the batch
+    const unseen=p.find(i=>!stat(i).t&&!seen(stat(i)));
+    if(unseen!==undefined)return unseen;
+  }
+  const avoid=Math.min(recent.length,p.length-1,filter==='learn'?2:6);
+  const block=new Set(recent.slice(recent.length-avoid));
   const pp=p.filter(i=>!block.has(i));
   const ws=pp.map(weight);let r=Math.random()*ws.reduce((a,b)=>a+b,0);
   for(let j=0;j<pp.length;j++){r-=ws[j];if(r<=0)return pp[j];}
@@ -292,20 +416,47 @@ function shuffled(n,keep){
   for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   return a;
 }
+// Trap words get highlighted so they can't be skimmed past
+function renderQ(text){
+  const frag=document.createDocumentFragment();
+  text.split(/\b(NOT|EXCEPT|FALSE|LESSER|BOTH|AFTER|BEFORE|ONLY|ALL)\b/).forEach((part,i)=>{
+    if(i%2){const m=document.createElement('mark');m.textContent=part;frag.append(m);}
+    else frag.append(part);
+  });
+  el.qText.replaceChildren(frag);
+}
+function setExp(q,state){
+  // state: 'teach' | 'right' | 'wrong'
+  const parts=[];
+  const add=(cls,label,text)=>{if(!text)return;const d=document.createElement('div');d.className='xrow '+cls;
+    if(label){const b=document.createElement('b');b.textContent=label;d.append(b,' ');}
+    d.append(text);parts.push(d);};
+  add('rule','',q.w);
+  add('why','Now why is that important?',q.i);
+  add('conf',"Don't confuse:",q.k);
+  const c=document.createElement('div');c.className='cite';
+  c.textContent=q.x+(q.v===0?' · not yet confirmed against statute text':'');
+  if(q.v===0)c.classList.add('unv');
+  parts.push(c);
+  el.exp.replaceChildren(...parts);
+}
 
 function next(){
-  cur=pick();answered=false;
-  el.exp.className='exp pending';el.nextBtn.disabled=true;
+  clearTimeout(lockTimer);
+  cur=pick();answered=false;teaching=false;
+  el.opts.classList.remove('locked');
+  el.exp.className='exp pending';el.nextBtn.disabled=true;el.nextBtn.textContent='NEXT →';
   if(cur<0){
-    el.qText.textContent='No weak spots here. Switch filters and keep drilling.';
-    el.opts.replaceChildren();el.qCat.textContent='';el.qSeen.textContent='';return;
+    const msg=filter==='learn'?'Every card is mastered. Switch to All for mixed review.':'Nothing here yet. Try another filter.';
+    el.qText.textContent=msg;el.opts.replaceChildren();el.exp.replaceChildren();el.qCat.textContent='';el.qSeen.textContent='';return;
   }
-  recent.push(cur);if(recent.length>6)recent.shift();
-  const q=Q[cur],t=stat(cur),seen=t.c+t.w;
-  el.qCat.textContent=CATS[q.c];
-  el.qSeen.textContent=seen?('seen '+seen+'× · '+(t.w?t.w+' missed':'clean')):'NEW';
-  el.qText.textContent=q.q;
-  order=shuffled(q.o.length,q.fix);
+  recent.push(cur);if(recent.length>8)recent.shift();
+  const q=Q[cur],t=stat(cur);
+  teaching=filter==='learn'&&!t.t&&!seen(t);
+  el.qCat.textContent=(teaching?'LEARN · ':'')+SECSHORT[q.s]+' · '+q.t;
+  el.qSeen.textContent=teaching?'NEW FACT':(seen(t)?('seen '+seen(t)+'× · '+(t.w?t.w+' missed':'clean')):'NEW');
+  renderQ(q.q);
+  const order=shuffled(q.o.length,q.fix);
   const frag=document.createDocumentFragment();
   order.forEach((orig,pos)=>{
     const b=document.createElement('button');
@@ -315,30 +466,46 @@ function next(){
     b.append(l,s);frag.append(b);
   });
   el.opts.replaceChildren(frag);
-  setExp(q);fit();
+  setExp(q);
+  el.exp.dataset.verdict='Rushed — you answered in under 3 seconds.'; // reserve room for it
+  fit();
   el.card.scrollTop=0;
+  if(teaching){                                    // show the answer first — learn it, then get tested on it later
+    for(const b of el.opts.children)b.classList.add(+b.dataset.j===q.a?'right':'faded');
+    el.exp.className='exp teach';el.exp.dataset.verdict='';
+    el.nextBtn.disabled=false;el.nextBtn.textContent='GOT IT → QUIZ ME LATER';
+    return;
+  }
+  el.opts.classList.add('locked');
+  lockTimer=setTimeout(()=>{el.opts.classList.remove('locked');unlockAt=performance.now();},LOCK_MS);
 }
 
 function answer(j){
-  if(answered||cur<0)return;answered=true;
+  if(answered||teaching||cur<0||el.opts.classList.contains('locked'))return;answered=true;
   const q=Q[cur],t={...stat(cur)},right=j===q.a;
+  const rushed=!right&&(performance.now()-unlockAt)<RUSH_MS;
   for(const b of el.opts.children){
     const k=+b.dataset.j;
     b.classList.add(k===q.a?'right':k===j?'wrong':'faded');
   }
   if(right){t.c++;t.s=t.s>0?t.s+1:1;S.streak++;S.today.c++;}
-  else{t.w++;t.s=t.s<0?t.s-1:-1;S.streak=0;}
-  S.q[cur]=t;S.today.n++;
-  el.exp.className='exp '+(right?'ok':'bad');el.nextBtn.disabled=false;
+  else{t.w++;t.s=t.s<0?t.s-1:-1;S.streak=0;if(rushed)t.f=(t.f||0)+1;}
+  S.q[q.id]=t;S.today.n++;
+  el.exp.className='exp '+(right?'ok':'bad');
+  el.exp.dataset.verdict=right?'':(rushed?'Rushed — you answered in under 3 seconds.':'');
+  el.nextBtn.disabled=false;
   el.card.scrollTo({top:el.card.scrollHeight,behavior:'smooth'});
   save();renderStats();
 }
 
 el.opts.addEventListener('click',e=>{const b=e.target.closest('.opt');if(b)answer(+b.dataset.j);});
-$('nextBtn').addEventListener('click',next);
+el.nextBtn.addEventListener('click',()=>{
+  if(teaching&&cur>=0){const q=Q[cur],t={...stat(cur)};t.t=1;S.q[q.id]=t;save();}
+  next();
+});
 $('filters').addEventListener('click',e=>{
   const c=e.target.closest('.chip');if(!c||!c.dataset.f)return;
-  filter=c.dataset.f;
+  filter=c.dataset.f;recent=[];
   for(const x of $('filters').children)if(x.dataset.f)x.classList.toggle('on',x===c);
   next();
 });
@@ -347,20 +514,20 @@ function renderStats(){
   el.today.textContent=S.today.n;
   el.acc.textContent=S.today.n?Math.round(100*S.today.c/S.today.n)+'%':'—';
   el.streak.textContent=S.streak>1?'🔥 '+S.streak:'';
-  const tot={},mas={};let weak=0;
-  for(const k in CATS){tot[k]=0;mas[k]=0;}
+  const tot={},mas={};let weak=0,rush=0;
+  for(const k in SEC){tot[k]=0;mas[k]=0;}
   for(let i=0;i<Q.length;i++){
-    const t=stat(i),c=Q[i].c;tot[c]++;
-    if(t.s>=2)mas[c]++;
+    const t=stat(i),s=Q[i].s;tot[s]++;
+    if(mastered(t))mas[s]++;
     if(isWeak(t))weak++;
+    if(t.f&&t.s<2)rush++;
   }
-  el.weak.textContent=weak;
-  el.mastery.innerHTML=Object.keys(CATS).map(c=>
-    '<div><div class="mlabel"><span>'+SHORT[c]+'</span><span>'+mas[c]+'/'+tot[c]+'</span></div><div class="mtrack"><div class="mfill" style="width:'+Math.round(100*mas[c]/tot[c])+'%"></div></div></div>'
+  el.weak.textContent=weak;el.rush.textContent=rush;
+  el.mastery.innerHTML=Object.keys(SEC).map(s=>
+    '<div><div class="mlabel"><span>'+SECSHORT[s].split(' ')[0]+'</span><span>'+mas[s]+'/'+tot[s]+'</span></div><div class="mtrack"><div class="mfill" style="width:'+Math.round(100*mas[s]/tot[s])+'%"></div></div></div>'
   ).join('');
 }
 
-// Tap twice to reset (browser confirm() popups don't show here)
 let armTimer;
 el.reset.addEventListener('click',()=>{
   if(!el.reset.classList.contains('armed')){
@@ -374,34 +541,29 @@ el.reset.addEventListener('click',()=>{
   S=fresh();recent=[];save();next();renderStats();
 });
 
-// ── Game-style scaling ─────────────────────────────────────────
-// The layout is designed at 420 units wide (iPhone Air). 1 unit = U px on this screen.
-// Width sets the scale; on short or wide screens height caps it so everything still fits, centered.
-const DESIGN_W=420,MIN_H=720;
+// ── Game-style scaling: designed at 420 units (iPhone Air), scaled to any screen, centered ──
+const DESIGN_W=420,MIN_H=780;
 let U=1;
 function setScale(){
   const w=document.body.clientWidth,h=document.body.clientHeight;
   U=Math.max(.6,Math.min(w/DESIGN_W,h/MIN_H));
   document.documentElement.style.setProperty('--u',U+'px');
 }
-function setExp(q){
-  el.exp.textContent=q.e;
-  const c=document.createElement('span');c.className='cite';c.textContent=q.x;el.exp.append(c);
-}
-// Biggest text that fits this question + its explanation inside the card (room for the explanation is reserved)
+// Biggest text that fits this question + its full explanation (room is reserved, so nothing jumps)
 function fit(){
   if(cur<0)return;
   const card=el.card,root=document.documentElement.style;
-  for(let q=30;q>=15;q-=.5){
+  for(let q=30;q>=14;q-=.5){
     root.setProperty('--qs',(q*U)+'px');
-    root.setProperty('--os',(Math.max(14,q*.8)*U)+'px');
-    root.setProperty('--es',(Math.max(13.5,q*.66)*U)+'px');
-    if(card.scrollHeight<=card.clientHeight+1)break;
+    root.setProperty('--os',(Math.max(13.5,q*.8)*U)+'px');
+    root.setProperty('--es',(Math.max(13,q*.64)*U)+'px');
+    if(card.scrollHeight<=card.clientHeight)break;
   }
 }
 function relayout(){setScale();fit();}
-let rq;addEventListener('resize',()=>{cancelAnimationFrame(rq);rq=requestAnimationFrame(relayout);});
-if(window.visualViewport)visualViewport.addEventListener('resize',()=>{cancelAnimationFrame(rq);rq=requestAnimationFrame(relayout);});
+let rq;const onResize=()=>{cancelAnimationFrame(rq);rq=requestAnimationFrame(relayout);};
+addEventListener('resize',onResize);
+if(window.visualViewport)visualViewport.addEventListener('resize',onResize);
 setScale();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
 
