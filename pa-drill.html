@@ -22,9 +22,11 @@
     background:var(--asphalt);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%;overflow:hidden;overscroll-behavior:none}
-  body{background:var(--asphalt);color:var(--chalk);font-family:var(--body);display:flex;justify-content:center;
-    padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+  html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none;touch-action:manipulation}
+  body{background:var(--asphalt);color:var(--chalk);font-family:var(--body);position:fixed;inset:0}
+  /* The stage is pinned to the screen between the notch/Dynamic Island and the home bar, so iOS can't scroll it away */
+  #frame{position:fixed;top:env(safe-area-inset-top,0px);bottom:env(safe-area-inset-bottom,0px);
+    left:env(safe-area-inset-left,0px);right:env(safe-area-inset-right,0px);display:flex;justify-content:center}
   .app{width:calc(420*var(--u));max-width:100%;height:100%;display:flex;flex-direction:column;gap:calc(10*var(--u));
     padding:calc(8*var(--u)) calc(14*var(--u)) calc(6*var(--u))}
 
@@ -82,13 +84,12 @@
   .next{flex:none;display:block;width:100%;border:none;border-radius:calc(15*var(--u));height:calc(60*var(--u));font-family:var(--display);font-size:calc(20*var(--u));letter-spacing:calc(1*var(--u));background:var(--gold);color:var(--asphalt);cursor:pointer}
   .next:disabled{background:var(--slate);color:var(--dim);border:1px solid var(--line)}
   @media (prefers-reduced-motion:no-preference){.opt,.chip,.next{transition:background .12s,border-color .12s,color .12s}}
-  :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 </style>
 </head>
 <body>
 
 
-<div class="app">
+<div id="frame"><div class="app">
   <header class="top">
     <div class="brand">
       <h1>DRILL<span class="dot">.</span><span class="score" id="streak"></span></h1>
@@ -124,7 +125,7 @@
 
   <section class="mast" id="mastery"></section>
   <button class="next" id="nextBtn" disabled>NEXT →</button>
-</div>
+</div></div>
 
 <script>
 // Question bank v5 — weighted to the Pearson VUE IL-PubAdj17 outline (eff. 1/1/2026): I 35% · II 25% · III 5% · IV 10% · V 25%.
@@ -545,7 +546,9 @@ el.reset.addEventListener('click',()=>{
 const DESIGN_W=420,MIN_H=780;
 let U=1;
 function setScale(){
-  const w=document.body.clientWidth,h=document.body.clientHeight;
+  const f=document.getElementById('frame');
+  const w=f.clientWidth,h=f.clientHeight;
+  if(window.scrollY||document.documentElement.scrollTop)window.scrollTo(0,0);
   U=Math.max(.6,Math.min(w/DESIGN_W,h/MIN_H));
   document.documentElement.style.setProperty('--u',U+'px');
 }
@@ -563,7 +566,11 @@ function fit(){
 function relayout(){setScale();fit();}
 let rq;const onResize=()=>{cancelAnimationFrame(rq);rq=requestAnimationFrame(relayout);};
 addEventListener('resize',onResize);
+addEventListener('scroll',()=>{if(window.scrollY)window.scrollTo(0,0);},{passive:true});
+addEventListener('orientationchange',onResize);
 if(window.visualViewport)visualViewport.addEventListener('resize',onResize);
+addEventListener('scroll',()=>{if(window.scrollY)window.scrollTo(0,0);},{passive:true});
+addEventListener('orientationchange',onResize);
 setScale();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
 
