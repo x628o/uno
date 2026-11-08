@@ -9,63 +9,65 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  /* Layout: game-style stage. Designed once at 420 units wide (iPhone Air), scaled by --u to any screen,
-     centered; extra height flows into the question card. Question/answer text auto-fits per question. */
+  /* Layout: game-style stage designed at 420×780 units (iPhone Air), scaled by --u and pinned between the
+     Dynamic Island and home bar. Two tabs — Study (reader) and Drill (quiz) — share one header and tab bar. */
   :root{
-    --asphalt:#121315;--slate:#1d1f23;--line:#2f333a;--chalk:#f2f0eb;--dim:#9a9ea7;
+    --asphalt:#121315;--slate:#1d1f23;--slate2:#25282d;--line:#2f333a;--chalk:#f2f0eb;--dim:#9a9ea7;
     --gold:#ffd23f;--right:#3ddc84;--wrong:#ff6b63;--blue:#6db2ff;
     --display:'Archivo Black','Arial Black',system-ui,sans-serif;
     --body:'Archivo',system-ui,-apple-system,sans-serif;
-    --u:1px;            /* 1 design unit; set by script */
-    --qs:24px;--os:19px;--es:16px; /* question / option / explanation size; set by auto-fit */
-    color-scheme:dark;-webkit-text-size-adjust:100%;text-size-adjust:100%;
-    background:var(--asphalt);
+    --u:1px;--qs:24px;--os:19px;--es:16px;
+    color-scheme:dark;-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--asphalt);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none;touch-action:manipulation}
   body{background:var(--asphalt);color:var(--chalk);font-family:var(--body);position:fixed;inset:0}
-  /* The stage is pinned to the screen between the notch/Dynamic Island and the home bar, so iOS can't scroll it away */
   #frame{position:fixed;top:env(safe-area-inset-top,0px);bottom:env(safe-area-inset-bottom,0px);
     left:env(safe-area-inset-left,0px);right:env(safe-area-inset-right,0px);display:flex;justify-content:center}
   .app{width:calc(420*var(--u));max-width:100%;height:100%;display:flex;flex-direction:column;gap:calc(10*var(--u));
-    padding:calc(8*var(--u)) calc(14*var(--u)) calc(6*var(--u))}
+    padding:calc(8*var(--u)) calc(14*var(--u)) calc(4*var(--u))}
+  button{font-family:var(--body);color:inherit}
+  button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
-  .top{display:flex;justify-content:space-between;align-items:center;gap:calc(10*var(--u));flex:none}
+  /* header */
+  .top{display:flex;justify-content:space-between;align-items:center;gap:calc(8*var(--u));flex:none}
   .brand{min-width:0}
-  h1{font-family:var(--display);font-size:calc(30*var(--u));letter-spacing:calc(1*var(--u));line-height:1;display:flex;align-items:baseline}
+  h1{font-family:var(--display);font-size:calc(27*var(--u));letter-spacing:calc(.5*var(--u));line-height:1;display:flex;align-items:baseline;white-space:nowrap}
   h1 .dot{color:var(--gold)}
-  .score{font-size:calc(16*var(--u));color:var(--gold);margin-left:calc(10*var(--u))}
-  .sub{color:var(--dim);font-size:calc(11*var(--u));margin-top:calc(5*var(--u));text-transform:uppercase;letter-spacing:calc(1.2*var(--u));white-space:nowrap}
+  .score{font-size:calc(15*var(--u));color:var(--gold);margin-left:calc(8*var(--u))}
+  .sub{color:var(--dim);font-size:calc(10.5*var(--u));margin-top:calc(5*var(--u));text-transform:uppercase;letter-spacing:calc(1*var(--u));white-space:nowrap}
+  .sub b{color:var(--gold);font-weight:700}
   .stats{display:flex;gap:calc(5*var(--u));flex:none}
-  .stat{background:var(--slate);border:1px solid var(--line);border-radius:calc(10*var(--u));padding:calc(5*var(--u)) calc(4*var(--u));text-align:center;width:calc(54*var(--u))}
-  .stat b{display:block;font-family:var(--display);font-size:calc(20*var(--u));line-height:1.1;font-variant-numeric:tabular-nums}
-  .stat span{font-size:calc(10*var(--u));color:var(--dim);text-transform:uppercase;letter-spacing:calc(.8*var(--u))}
+  .stat{background:var(--slate);border:1px solid var(--line);border-radius:calc(10*var(--u));padding:calc(5*var(--u)) calc(3*var(--u));text-align:center;width:calc(52*var(--u))}
+  .stat b{display:block;font-family:var(--display);font-size:calc(18*var(--u));line-height:1.15;font-variant-numeric:tabular-nums}
+  .stat span{font-size:calc(9.5*var(--u));color:var(--dim);text-transform:uppercase;letter-spacing:calc(.6*var(--u))}
   .stat b.g{color:var(--right)} .stat b.r{color:var(--wrong)} .stat b.y{color:var(--gold)}
 
+  .view{flex:1;min-height:0;display:flex;flex-direction:column;gap:calc(10*var(--u))}
+  .view[hidden]{display:none!important}
+
+  /* drill */
   .filters{display:flex;gap:calc(7*var(--u));flex:none;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-14*var(--u));padding-inline:calc(14*var(--u))}
   .filters::-webkit-scrollbar{display:none}
-  .chip{flex:none;background:var(--slate);border:1px solid var(--line);color:var(--dim);border-radius:99px;padding:0 calc(15*var(--u));height:calc(40*var(--u));font-size:calc(15*var(--u));font-weight:700;cursor:pointer;font-family:var(--body);white-space:nowrap}
+  .chip{flex:none;background:var(--slate);border:1px solid var(--line);color:var(--dim);border-radius:99px;padding:0 calc(14*var(--u));height:calc(38*var(--u));font-size:calc(14.5*var(--u));font-weight:700;cursor:pointer;white-space:nowrap}
   .chip.learn{color:var(--blue);border-color:rgba(109,178,255,.45)}
   .chip.on{color:var(--asphalt);background:var(--gold);border-color:var(--gold)}
-  .chip.reset{background:none;font-size:calc(13*var(--u));text-transform:uppercase;letter-spacing:calc(.8*var(--u))}
+  .chip.reset{background:none;font-size:calc(12.5*var(--u));text-transform:uppercase;letter-spacing:calc(.8*var(--u))}
   .chip.reset.armed{border-color:var(--wrong);color:var(--wrong)}
-
-  .qcard{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:var(--slate);border:1px solid var(--line);border-radius:calc(18*var(--u));padding:calc(16*var(--u));display:flex;flex-direction:column}
-  .qmeta{display:flex;justify-content:space-between;gap:calc(8*var(--u));font-size:calc(12*var(--u));color:var(--dim);text-transform:uppercase;letter-spacing:calc(1.1*var(--u));margin-bottom:calc(10*var(--u));flex:none}
-  .qmeta .seen{color:var(--blue);text-align:right}
+  .qcard{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:var(--slate);border:1px solid var(--line);border-radius:calc(18*var(--u));padding:calc(15*var(--u))}
+  .qmeta{display:flex;justify-content:space-between;gap:calc(8*var(--u));font-size:calc(11.5*var(--u));color:var(--dim);text-transform:uppercase;letter-spacing:calc(1*var(--u));margin-bottom:calc(10*var(--u))}
+  .qmeta .seen{color:var(--blue);text-align:right;flex:none}
+  .qtext{font-size:var(--qs);font-weight:700;line-height:1.3;margin-bottom:calc(13*var(--u));text-wrap:pretty}
   .qtext mark{background:none;color:var(--gold);text-decoration:underline;text-underline-offset:.15em;text-decoration-thickness:.08em}
-  .qtext{font-size:var(--qs);font-weight:700;line-height:1.3;margin-bottom:calc(14*var(--u));text-wrap:pretty}
-  #opts{display:flex;flex-direction:column;gap:calc(9*var(--u))}
-  .opt{display:flex;gap:.6em;align-items:center;width:100%;text-align:left;background:var(--asphalt);border:1.5px solid var(--line);color:var(--chalk);border-radius:calc(13*var(--u));padding:.62em .85em;min-height:calc(var(--os)*2.9);font-size:var(--os);font-family:var(--body);font-weight:600;cursor:pointer;line-height:1.28}
+  #opts{display:flex;flex-direction:column;gap:calc(8*var(--u))}
+  .opt{display:flex;gap:.6em;align-items:center;width:100%;text-align:left;background:var(--asphalt);border:1.5px solid var(--line);border-radius:calc(13*var(--u));padding:.6em .85em;min-height:calc(var(--os)*2.8);font-size:var(--os);font-weight:600;cursor:pointer;line-height:1.28}
   .opt .ltr{color:var(--dim);font-weight:700;flex:none}
-  .opt:focus-visible,.chip:focus-visible,.next:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   .opt.right{background:rgba(61,220,132,.15);border-color:var(--right);color:var(--right)}
   .opt.right .ltr,.opt.wrong .ltr{color:inherit}
   .opt.wrong{background:rgba(255,107,99,.13);border-color:var(--wrong);color:var(--wrong)}
   .opt.faded{opacity:.4}
   #opts.locked .opt{opacity:.5;pointer-events:none}
-  #opts{transition:none}
-  .exp{background:var(--asphalt);border-left:calc(5*var(--u)) solid var(--gold);border-radius:calc(10*var(--u));padding:.65em .85em;font-size:var(--es);line-height:1.42;margin-top:calc(12*var(--u))}
+  .exp{background:var(--asphalt);border-left:calc(5*var(--u)) solid var(--gold);border-radius:calc(10*var(--u));padding:.65em .85em;font-size:var(--es);line-height:1.42;margin-top:calc(11*var(--u))}
   .exp.pending{visibility:hidden}
   .exp.ok{border-left-color:var(--right)} .exp.bad{border-left-color:var(--wrong)} .exp.teach{border-left-color:var(--blue)}
   .exp[data-verdict]:not([data-verdict=''])::before{content:attr(data-verdict);display:block;color:var(--wrong);font-weight:700;margin-bottom:.3em}
@@ -73,17 +75,60 @@
   .xrow.rule{font-weight:600}
   .xrow b{color:var(--gold);font-weight:700}
   .xrow.conf b{color:var(--blue)}
+  .exp .cite{color:var(--dim);font-size:.8em;margin-top:.45em;letter-spacing:.03em}
   .exp .cite.unv{color:var(--gold)}
-  .exp .cite{color:var(--dim);font-size:.8em;display:block;margin-top:.45em;letter-spacing:.03em}
-
-  .mast{display:grid;grid-template-columns:repeat(5,1fr);gap:calc(8*var(--u));flex:none}
-  .mlabel{display:flex;justify-content:space-between;gap:calc(4*var(--u));font-size:calc(10.5*var(--u));color:var(--dim);margin-bottom:calc(4*var(--u));text-transform:uppercase;letter-spacing:calc(.6*var(--u));font-variant-numeric:tabular-nums;white-space:nowrap}
-  .mtrack{height:calc(5*var(--u));background:var(--slate);border-radius:99px;overflow:hidden}
-  .mfill{height:100%;background:var(--gold);border-radius:99px}
-
-  .next{flex:none;display:block;width:100%;border:none;border-radius:calc(15*var(--u));height:calc(60*var(--u));font-family:var(--display);font-size:calc(20*var(--u));letter-spacing:calc(1*var(--u));background:var(--gold);color:var(--asphalt);cursor:pointer}
+  .readlink{display:block;margin-top:.55em;background:none;border:none;color:var(--blue);font-size:.92em;font-weight:700;cursor:pointer;padding:.15em 0;text-align:left}
+  .next{flex:none;width:100%;border:none;border-radius:calc(15*var(--u));height:calc(56*var(--u));font-family:var(--display);font-size:calc(19*var(--u));letter-spacing:calc(1*var(--u));background:var(--gold);color:var(--asphalt);cursor:pointer}
   .next:disabled{background:var(--slate);color:var(--dim);border:1px solid var(--line)}
-  @media (prefers-reduced-motion:no-preference){.opt,.chip,.next{transition:background .12s,border-color .12s,color .12s}}
+
+  /* study */
+  .pane{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .cont{width:100%;background:var(--gold);color:var(--asphalt);border:none;border-radius:calc(15*var(--u));padding:calc(13*var(--u)) calc(16*var(--u));text-align:left;cursor:pointer;margin-bottom:calc(14*var(--u))}
+  .cont small{display:block;font-size:calc(11*var(--u));font-weight:700;text-transform:uppercase;letter-spacing:calc(1*var(--u));opacity:.7}
+  .cont span{display:block;font-family:var(--display);font-size:calc(19*var(--u));margin-top:calc(3*var(--u))}
+  .grp{font-size:calc(11.5*var(--u));color:var(--dim);text-transform:uppercase;letter-spacing:calc(1.2*var(--u));margin:calc(14*var(--u)) 0 calc(7*var(--u))}
+  .grp b{color:var(--gold)}
+  .row{display:flex;align-items:center;gap:calc(12*var(--u));width:100%;background:var(--slate);border:1px solid var(--line);border-radius:calc(13*var(--u));padding:calc(12*var(--u)) calc(14*var(--u));margin-bottom:calc(7*var(--u));text-align:left;cursor:pointer}
+  .row .chk{flex:none;width:calc(24*var(--u));height:calc(24*var(--u));border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:calc(13*var(--u));font-weight:700;color:var(--asphalt)}
+  .row.read .chk{background:var(--right);border-color:var(--right)}
+  .row .tt{flex:1;min-width:0}
+  .row .tt b{display:block;font-size:calc(16.5*var(--u));font-weight:700;line-height:1.25}
+  .row .tt span{display:block;font-size:calc(12*var(--u));color:var(--dim);margin-top:calc(3*var(--u))}
+  .row .bar{height:calc(4*var(--u));background:var(--asphalt);border-radius:99px;margin-top:calc(6*var(--u));overflow:hidden}
+  .row .bar i{display:block;height:100%;background:var(--gold);border-radius:99px}
+  .rbar{display:flex;align-items:center;gap:calc(10*var(--u));flex:none}
+  .back{flex:none;background:var(--slate);border:1px solid var(--line);border-radius:99px;height:calc(38*var(--u));padding:0 calc(14*var(--u));font-size:calc(14.5*var(--u));font-weight:700;color:var(--chalk);cursor:pointer}
+  .rtitle{flex:1;min-width:0;font-size:calc(12*var(--u));color:var(--dim);text-transform:uppercase;letter-spacing:calc(1*var(--u));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .reader{background:var(--slate);border:1px solid var(--line);border-radius:calc(18*var(--u));padding:calc(18*var(--u)) calc(17*var(--u)) calc(24*var(--u));font-size:calc(17*var(--u));line-height:1.55}
+  .reader h2{font-family:var(--display);font-size:calc(25*var(--u));line-height:1.15;margin-bottom:calc(14*var(--u));text-wrap:balance}
+  .reader h3{font-size:calc(18.5*var(--u));font-weight:700;margin:calc(20*var(--u)) 0 calc(7*var(--u));color:var(--chalk)}
+  .reader p{margin-bottom:calc(11*var(--u))}
+  .reader strong{color:var(--gold);font-weight:700}
+  .reader ul{padding-left:1.1em;margin-bottom:calc(11*var(--u))}
+  .reader li{margin-bottom:calc(6*var(--u))}
+  .reader li::marker{color:var(--gold)}
+  .tblw{overflow-x:auto;margin:calc(4*var(--u)) 0 calc(13*var(--u))}
+  .reader table{width:100%;border-collapse:collapse;font-size:calc(15*var(--u));line-height:1.35}
+  .reader th{text-align:left;color:var(--dim);font-size:calc(11.5*var(--u));text-transform:uppercase;letter-spacing:calc(.8*var(--u));font-weight:700;padding:0 calc(8*var(--u)) calc(6*var(--u)) 0;border-bottom:1px solid var(--line)}
+  .reader td{padding:calc(8*var(--u)) calc(8*var(--u)) calc(8*var(--u)) 0;border-bottom:1px solid var(--line);vertical-align:top}
+  .reader td:first-child{font-weight:700;color:var(--chalk);white-space:nowrap;padding-right:calc(12*var(--u))}
+  .note{border-radius:calc(11*var(--u));padding:calc(11*var(--u)) calc(13*var(--u));margin:calc(4*var(--u)) 0 calc(13*var(--u));font-size:calc(15.5*var(--u));line-height:1.45;border:1px solid;background:var(--asphalt)}
+  .note b{display:block;font-size:calc(11*var(--u));text-transform:uppercase;letter-spacing:calc(1*var(--u));margin-bottom:calc(4*var(--u))}
+  .note.why{border-color:rgba(255,210,63,.4)} .note.why b{color:var(--gold)}
+  .note.upd{border-color:rgba(255,107,99,.55)} .note.upd b{color:var(--wrong)}
+  .note.trap{border-color:rgba(109,178,255,.45)} .note.trap b{color:var(--blue)}
+  .note.add{border-color:var(--line)} .note.add b{color:var(--dim)}
+  .note.unv{border-color:rgba(255,210,63,.25);color:var(--dim)} .note.unv b{color:var(--gold)}
+  .anchor.flash{animation:flash 1.6s ease-out}
+  @keyframes flash{0%{box-shadow:inset 0 0 0 999px rgba(255,210,63,.18)}100%{box-shadow:none}}
+  .quizme{flex:none}
+
+  /* tab bar */
+  .tabs{flex:none;display:grid;grid-template-columns:1fr 1fr;gap:calc(6*var(--u));background:var(--slate);border:1px solid var(--line);border-radius:calc(16*var(--u));padding:calc(4*var(--u))}
+  .tab{border:none;background:none;border-radius:calc(12*var(--u));height:calc(44*var(--u));font-size:calc(15*var(--u));font-weight:700;letter-spacing:calc(1*var(--u));text-transform:uppercase;color:var(--dim);cursor:pointer}
+  .tab.on{background:var(--chalk);color:var(--asphalt)}
+  @media (prefers-reduced-motion:no-preference){.opt,.chip,.next,.tab{transition:background .12s,border-color .12s,color .12s}}
+  @media (prefers-reduced-motion:reduce){.anchor.flash{animation:none}}
 </style>
 </head>
 <body>
@@ -92,8 +137,8 @@
 <div id="frame"><div class="app">
   <header class="top">
     <div class="brand">
-      <h1>DRILL<span class="dot">.</span><span class="score" id="streak"></span></h1>
-      <div class="sub">IL PA Exam · <span id="bankN"></span> Qs</div>
+      <h1>PA PREP<span class="dot">.</span><span class="score" id="streak"></span></h1>
+      <div class="sub"><span id="bankN"></span> Qs · <b>build 6</b></div>
     </div>
     <div class="stats">
       <div class="stat"><b id="sToday">0</b><span>Today</span></div>
@@ -103,28 +148,39 @@
     </div>
   </header>
 
-  <nav class="filters" id="filters">
-    <button class="chip on" data-f="all">Exam Mix</button>
-    <button class="chip learn" data-f="learn">Learn New</button>
-    <button class="chip" data-f="weak">Weak Spots</button>
-    <button class="chip" data-f="traps">Number Traps</button>
-    <button class="chip" data-f="s1">I Products</button>
-    <button class="chip" data-f="s2">II Terms</button>
-    <button class="chip" data-f="s3">III Contract</button>
-    <button class="chip" data-f="s4">IV Building</button>
-    <button class="chip" data-f="s5">V IL Law</button>
-    <button class="chip reset" id="resetBtn">Reset Progress</button>
-  </nav>
+  <section class="view" id="vStudy">
+    <div class="pane" id="chHome"></div>
+    <div class="view" id="chRead" hidden>
+      <div class="rbar"><button class="back" id="backBtn">‹ Chapters</button><div class="rtitle" id="rTitle"></div></div>
+      <div class="pane" id="rPane"><article class="reader" id="reader"></article></div>
+      <button class="next quizme" id="quizBtn">QUIZ ME ON THIS →</button>
+    </div>
+  </section>
 
-  <main class="qcard" id="card">
-    <div class="qmeta"><span id="qCat"></span><span class="seen" id="qSeen"></span></div>
-    <div class="qtext" id="qText"></div>
-    <div id="opts"></div>
-    <div class="exp pending" id="exp"></div>
-  </main>
+  <section class="view" id="vDrill" hidden>
+    <nav class="filters" id="filters">
+      <button class="chip ch" data-f="" id="chChip" hidden></button>
+      <button class="chip on" data-f="all">Exam Mix</button>
+      <button class="chip learn" data-f="learn">Learn New</button>
+      <button class="chip" data-f="weak">Weak Spots</button>
+      <button class="chip" data-f="traps">Number Traps</button>
+      <button class="chip" data-f="s1">I Products</button>
+      <button class="chip" data-f="s2">II Terms</button>
+      <button class="chip" data-f="s3">III Contract</button>
+      <button class="chip" data-f="s4">IV Building</button>
+      <button class="chip" data-f="s5">V IL Law</button>
+      <button class="chip reset" id="resetBtn">Reset Progress</button>
+    </nav>
+    <main class="qcard" id="card">
+      <div class="qmeta"><span id="qCat"></span><span class="seen" id="qSeen"></span></div>
+      <div class="qtext" id="qText"></div>
+      <div id="opts"></div>
+      <div class="exp pending" id="exp"></div>
+    </main>
+    <button class="next" id="nextBtn" disabled>NEXT →</button>
+  </section>
 
-  <section class="mast" id="mastery"></section>
-  <button class="next" id="nextBtn" disabled>NEXT →</button>
+  <nav class="tabs" id="tabs"><button class="tab on" data-v="study">Study</button><button class="tab" data-v="drill">Drill</button></nav>
 </div></div>
 
 <script>
@@ -307,6 +363,10 @@ const Q=[
 {s:5,t:"Penalties",q:"Maximum civil penalty per cause / total:",o:["$5K / $50K","$10K / $100K","$25K / $250K","$10K / unlimited"],a:1,w:"Up to $10,000 per cause, $100,000 total.",x:"215 ILCS 5/1555",nt:1,fix:1,v:0},
 {s:5,t:"Penalties",q:"After revocation, a PA may reapply after:",o:["1 year","3 years","5 years","Never"],a:2,w:"5 years.",k:"Records are kept 7 years — different number.",x:"215 ILCS 5/1555",nt:1,fix:1,v:0},
 {s:5,t:"Penalties",q:"A PA must report an administrative action taken in another state within:",o:["10 days","30 days of final disposition","60 days","At renewal"],a:1,w:"30 days after final disposition.",k:"Yet another 30-day rule.",x:"215 ILCS 5/1595",nt:1,fix:1,v:0},
+{s:5,t:"Conduct",q:"A PA signs a pre-arranged contract at 6:30 p.m., then knocks on the neighbor's door at 7:15 p.m. to solicit. Which is correct?",o:["Both are lawful","The signing is lawful; the 7:15 solicitation is prohibited","Both are prohibited after 7 p.m.","The solicitation is fine since the PA was already there"],a:1,w:"Soliciting is banned 7 p.m.–8 a.m.; signing a contract already arranged isn't soliciting.",i:"Storm-day canvassing runs late. The clock applies to the knock, not the paperwork.",x:"215 ILCS 5/1590(b)",fix:1},
+{s:5,t:"Contracts",q:"Signed Monday. PA emails the carrier Wednesday; carrier receives it Wednesday. Client wants to cancel the following Tuesday. Can they?",o:["No — 5 business days ran from signing","Yes — 5 business days run from when the insurer receives it","No — rescission only applies in catastrophes","Yes — but only by certified mail"],a:1,w:"The window starts when the insurer receives the contract: Wednesday → following Wednesday.",i:"Every day you wait to email the carrier extends the client's cancel window.",x:"215 ILCS 5/1575(j)",fix:1},
+{s:5,t:"Contractors",q:"A PA owns part of a restoration company. Under Illinois law, the PA:",o:["Can never refer clients there","May refer clients if they give full written disclosure of the interest before the contract is signed","May refer without disclosure if the company is licensed","Must sell the interest before licensing"],a:1,w:"The relationship is legal; written disclosure before signing is required. No fee differences tied to using it.",i:"If All Dire ever partners with a crew, this disclosure is mandatory paperwork.",x:"215 ILCS 5/1575(d), 1590; 3118.85"},
+{s:5,t:"Fees",q:"A PA charges 15% on a personal residence claim, and the homeowner signed agreeing to it. The fee:",o:["Is lawful because the cap only applies in catastrophes","Violates the 10% personal residence cap","Is lawful because the client agreed in writing","Is lawful if the Director approved it"],a:1,w:"The 10% personal residence cap always applies and can't be contracted around.",i:"Director approval for more than 10% exists only for non-residential catastrophe claims.",x:"215 ILCS 5/1570(e)"},
 {s:5,t:"Part 919 claims",q:"Under Part 919, 'reasonable promptness' to respond to a communication is at most:",o:["10 working days","15 working days","21 working days","30 days"],a:1,w:"15 working days from receipt of communication.",i:"Unanswered emails past 15 working days = a documented 154.6 violation to cite.",k:"21 working days = begin investigation.",x:"50 IAC 919.40",nt:1,fix:1},
 {s:5,t:"Part 919 claims",q:"When liability is reasonably clear, the insurer must try to contact all insureds/claimants within:",o:["15 working days","21 working days after notification of loss","30 days","45 days"],a:1,w:"21 working days after notice of loss.",k:"15 = respond to communications.",x:"50 IAC 919.40",nt:1,fix:1},
 {s:5,t:"Part 919 claims",q:"Once liability is affirmed and the amount isn't disputed, the insurer must offer payment within:",o:["15 days","21 days","30 days","45 days"],a:2,w:"30 days after affirming liability.",x:"50 IAC 919.50",nt:1,fix:1},
@@ -320,43 +380,284 @@ const Q=[
 {s:5,t:"Section 155",q:"The Section 155 penalty is capped at the LESSER of 60% of the amount owed, the excess over the pre-suit offer, or:",o:["$25,000","$50,000","$60,000","$100,000"],a:2,w:"$60,000 — plus reasonable attorney fees and costs.",x:"215 ILCS 5/155",nt:1,fix:1}
 ];
 
-// ── Exam weights: in mixed modes, draws follow the real exam split, not the bank's size ──
+// Study chapters — built from "Illinois Public Adjuster Exam: Complete Legal and Regulatory Study Guide" (Feb 2026),
+// corrected where Illinois changed the rules, plus added chapters for exam Sections I and IV the guide only skimmed.
+// Block types: ['h',text] heading · ['p',text] paragraph (**bold**) · ['ul',[items]] · ['tbl',[[head],[row]...]]
+// ['note',kind,text] kind: why | upd (rule changed) | trap (exam trap) | add (not in your Feb guide) | unv (not yet confirmed)
+// ['a',topic] anchor: drill answers on this topic jump here.
+const CH=[
+{id:"exam",sec:0,title:"The exam itself",min:3,topics:[],b:[
+ ['p',"The Illinois Public Adjuster exam (**IL-PubAdj17**) is run by Pearson VUE at test centers only. No online option. The fee is **$92**, which includes a $50 state fee. Illinois requires **no pre-licensing course**, so the exam is the only gate."],
+ ['tbl',[["Section","Qs"],["I. Property insurance products","35"],["II. P&C terms and concepts","25"],["III. Policy provisions & contract law","5"],["IV. Electrical/building & estimating","10"],["V. Illinois laws & regulations","25"]]],
+ ['p',"**100 scored questions, 165 minutes, passing score 70 — scaled**, not a raw percentage. Retakes: wait **7 days** after a first fail, **30 days** after a second or later fail."],
+ ['note','why',"165 minutes for 100 questions is about 1.6 minutes each. Time is not your enemy. Answering before you finish reading is. That's why the drill locks answers for one second."],
+ ['p',"The outline cites: ISO Homeowners forms, the **New York Standard Fire Policy**, ISO Commercial Property forms, the **National Flood Insurance Policy**, marine forms, the Illinois Insurance Code (215 ILCS 5/), and **50 Ill. Admin. Code Parts 919 and 3118**."]
+]},
+// ── SECTION V · ILLINOIS LAW ──
+{id:"scope",sec:5,title:"Who is a PA — and who's exempt",min:4,topics:["Scope & exemptions"],b:[
+ ['a',"Scope & exemptions"],
+ ['p',"Article XLV of the Insurance Code (**215 ILCS 5/1501–1615**) is the Public Adjusters Law. It's 25 sections, enacted 2011, last broadly amended by **P.A. 103-216 (eff. Jan 1, 2024)**."],
+ ['p',"A public adjuster is anyone who, **for compensation**, acts for the insured **solely on first-party claims** under policies covering real or personal property (§1510). It covers adjusting those claims, advertising or soliciting as a PA, and advising insureds about them."],
+ ['note','trap',"First-party only — the insured's own policy. PAs never handle liability (third-party) claims."],
+ ['h',"Five exemptions (§1515(d))"],
+ ['ul',["Licensed **attorneys** acting as attorneys","People negotiating **life, health, or annuity** claims","**Technical assistance only** — photographers, estimators, engineers, investigators — who never negotiate","Licensed **health care providers** filing health claim forms","People settling **subrogation between insurers**"]],
+ ['note','why',"A contractor who negotiates the claim for the homeowner is NOT exempt. That's unlicensed PA activity — the exact trap the roofing industry walks into."],
+ ['p',"Contracts made by an unlicensed person acting as a PA are **void and invalid** (§1515(e)). A business entity needs **its own license** and must designate a licensed individual responsible for compliance (§1515(c), §1525(b))."]
+]},
+{id:"license",sec:5,title:"Getting and keeping the license",min:5,topics:["Licensing"],b:[
+ ['a',"Licensing"],
+ ['tbl',[["Requirement","Detail"],["Minimum age","18 (§1525)"],["Bond / letter of credit","$50,000 (§1560)"],["License fee — resident","$250 / 2 yrs, via NIPR"],["License fee — nonresident","$500 / 2 yrs"],["Business entity","$250 / 2 yrs"],["Exam fee","$92 (incl. $50 state fee)"],["Continuing ed","24 hrs / 2 yrs incl. 3 ethics (§1565)"],["Fingerprints","Required — ISP + FBI before licensing"],["Lapsed license","Reinstate within 12 months at double the unpaid fee (§1545)"]]],
+ ['note','unv',"Nonresident fee, entity fee, and the reinstatement penalty come from the Feb guide and haven't been confirmed against statute text yet."],
+ ['h',"Nonresidents and moving here"],
+ ['p',"A nonresident gets an Illinois license if they hold a resident PA license in good standing at home and their state reciprocates (§1540). If the home license ends, **the Illinois license ends immediately**. Address changes go to the Director within **30 days**."],
+ ['p',"A PA licensed in another state for **12 months** in good standing may skip the exam (§1535). Someone moving to Illinois applies within **90 days** of residency."],
+ ['h',"The licensing path, in order"],
+ ['ul',["Pass the exam ($92)","Wait **5 days**, then apply","Fingerprint (Illinois-approved live scan)","Get the **$50,000** bond or letter of credit","File your **contract form** with IDOI","Apply through **NIPR** with the $250 fee — upload bond and contract or it's rejected","**Don't sign any client** until the license is issued AND the contract is approved — two separate approvals"]],
+ ['note','why',"For All Dire, this is your launch checklist. The two-approval rule is tested and it's also the mistake that voids your first contract."],
+ ['p',"Records of every transaction are kept **at least 7 years** after it ends, open to the Director anytime (§1585)."]
+]},
+{id:"fees",sec:5,title:"Fees and the 10% cap",min:4,topics:["Fees"],b:[
+ ['a',"Fees"],
+ ['p',"The 2024 amendments rebuilt PA pay rules. Heavily tested."],
+ ['ul',["**Personal residence:** no more than **10%** of the insurer's settlement payment on any claim — always (§1570(e))","**Other property:** **10%** when the loss is from a catastrophic event, unless the Director approves more in writing (§1570(d))","Fee can't include the **deductible** — only net claim payments count (Rule 3118.90(c))","No commissions to unlicensed people who need a license; unlicensed people can't take adjusting fees (§1570(a),(b))"]],
+ ['p',"'Personal residence' means property under a fire and extended coverage policy: a **1–4 family dwelling** and the household contents in it."],
+ ['note','upd',"Bulletin 2024-16: on personal residence claims you can't add travel, lodging, meals, or expert fees on top of the 10%. Only policy-covered costs like emergency mitigation can be reimbursed outside the cap. Experts you hire are paid by YOU."],
+ ['note','unv',"The Feb guide also says a catastrophe declaration lasts 90 days, renews in 30-day steps county by county, and the Director answers exception requests in 5 business days. Not yet confirmed against statute text."],
+ ['h',"When you get no percentage at all"],
+ ['p',"If the insurer pays or commits in writing to pay the **policy limit within 5 business days** after the loss is reported, the PA gets **no commission — only reasonable compensation for services provided** (§1575(c))."],
+ ['note','why',"That's the law stopping a PA from taking 10% of money the carrier was already handing over."]
+]},
+{id:"contract",sec:5,title:"The PA contract",min:6,topics:["Contracts"],b:[
+ ['a',"Contracts"],
+ ['p',"Every contract is written and filed with **IDOI for approval before use**. Rule 3118.80: at least **10-point font**, form number and edition in the **lower left corner**."],
+ ['h',"Must include (§1575(a))"],
+ ['ul',["PA's legal name, home-state address, email, phone","License number(s)","Title: **\"Public Adjuster Contract\"**","Insured's name, address, insurer, policy number","Description of the loss and its location","Description of services","Both signatures, with date and time of each","Attestation that the PA is fully bonded","Full compensation, including any 10% cap"]],
+ ['h',"The cancel window (§1575(j))"],
+ ['p',"The insured can void the contract within **5 business days after the insurance company receives it**. The PA must email the insurer an exact copy within **5 business days** of signing. Cancellation can come by **certified/registered mail, personal service, or email**. If cancelled, the PA returns anything of value within **15 business days**."],
+ ['note','upd',"Before 2024 the window ran from signing. Now it runs from when the carrier receives the contract — old guides get this wrong."],
+ ['note','why',"Your email to the carrier starts the client's clock. Send it the same day and keep proof."],
+ ['h',"Prohibited terms (§1575(e), Rule 3118.90)"],
+ ['ul',["Fees on money due but not yet paid, or the **whole fee from the first check**","Requiring checks issued **only in the PA's name**","Blocking the insured's **civil remedies**","**Hold-harmless** for the PA's own negligence","**Power of attorney** to act in place of the insured","A **higher fee** if the client skips your preferred contractor","**Requiring** your preferred contractor","A fee that **includes the deductible**"]],
+ ['note','trap',"Naming the PA as co-payee is ALLOWED (with the exact percentage stated). Power of attorney is NOT."],
+ ['h',"The pre-signing disclosure (§1575(f))"],
+ ['p',"Before signing, the insured gets a separate signed disclosure explaining the **three kinds of adjusters — company, independent, public** — and stating: hiring a PA is not required; the PA doesn't represent the insurer or IDOI; the fee is the insured's to pay."]
+]},
+{id:"conduct",sec:5,title:"Conduct rules and contractors",min:5,topics:["Conduct","Contractors"],b:[
+ ['a',"Conduct"],
+ ['p',"The fiduciary standard, word for word: **\"objectivity and complete loyalty to the interests of the client alone\"** (§1590(a))."],
+ ['h',"Solicitation"],
+ ['ul',["No soliciting **7:00 p.m. – 8:00 a.m.**","No soliciting while the **fire department is on scene** or the loss is still happening"]],
+ ['note','trap',"Signing a contract you already arranged at 7:30 p.m. is fine. Knocking on the neighbor's door at 7:15 p.m. is not — that's soliciting."],
+ ['h',"Other prohibitions"],
+ ['ul',["No settling without the insured's **knowledge and consent**","No **legal advice**","No unlicensed employees doing PA work","No **advancing money** to the insured, except for emergency services","No salvage interest without the insured's **written OK after settlement**","Don't take claims **beyond your expertise**"]],
+ ['a',"Contractors"],
+ ['h',"Contractors and referrals"],
+ ['note','upd',"REPEALED April 30, 2024: the 'present two competitive bids' rule and the 'PA warrants the contractor's workmanship' rule. Your Feb guide still teaches both. Don't pick them on the exam."],
+ ['p',"Current rule (Rule 3118.90): before recommending a contractor, confirm it has **liability insurance, a performance bond, required licenses, and a written workmanship warranty** — and document that in your records."],
+ ['p',"Disclose in writing, before signing, any **direct or indirect financial interest** in anyone involved in the claim — ownership, investments, shared employees, referral fees, family interests. The relationship is legal; hiding it isn't."],
+ ['h',"Client money"],
+ ['p',"Funds held for the insured go into a separate **escrow or trust account at an FDIC-insured institution** (§1580). Mixing them with your money is **commingling**. Taking them is a **Class 4 felony**."],
+ ['note','unv',"The Feb guide adds: non-interest-bearing, in your home state or where the loss happened. Not yet confirmed against statute text."]
+]},
+{id:"penalties",sec:5,title:"Penalties and discipline",min:3,topics:["Penalties"],b:[
+ ['a',"Penalties"],
+ ['p',"The Director can deny, suspend, revoke, or refuse to renew for many listed grounds: misstatements, misappropriation, dishonesty convictions, fraud, cheating on the exam, bad records, conduct violations (§1555)."],
+ ['tbl',[["Item","Rule"],["Civil penalty","Up to $10,000 per cause, $100,000 total"],["After revocation","Can't reapply for 5 years"],["Unlicensed PA work","Class A misdemeanor (§1610)"],["Taking client money","Class 4 felony (§1610)"],["Action in another state","Report within 30 days of final disposition (§1595)"]]],
+ ['note','unv',"Penalty amounts, the 5-year wait, and the 30-day reporting rule are from the Feb guide — not yet confirmed against statute text. The two criminal classes are confirmed."]
+]},
+{id:"carrier",sec:5,title:"Carrier rules: Part 919 and §155",min:6,topics:["Part 919 claims","Section 155"],b:[
+ ['a',"Part 919 claims"],
+ ['p',"You represent the insured, but the exam tests what carriers must do — because that's how you spot violations."],
+ ['h',"Unfair claims practices (§154.6)"],
+ ['ul',["Misrepresenting facts or policy terms","Not acknowledging communications promptly","No reasonable standards for investigation","Not settling in good faith when liability is clear","Forcing suits by lowballing","Refusing to pay without a reasonable investigation"]],
+ ['note','trap',"§154.6 has NO private right of action. The Director enforces it, and the acts must be knowing or a general business practice. The client's own lawsuit tool is §155."],
+ ['h',"The clocks (50 IAC 919)"],
+ ['tbl',[["Clock","Rule"],["15 working days","Respond to communications"],["21 working days","Contact all parties after notice of loss (liability clear)"],["30 days","Offer payment after affirming liability; pay undisputed amounts"],["30 days","Written explanation of a denial/lower settlement after investigation"],["40 calendar days","Median payment benchmark (fire/EC)"],["75 days or 25 after proof of loss","Written delay explanation — whichever is LESS"]]],
+ ['note','why',"File proof of loss early — it can start the 25-day clock before the 75-day one."],
+ ['p',"Carriers must include the **Notice of Availability of the Department of Insurance** with denials and delay letters, and give the **depreciation worksheet** on request (age, condition, life expectancy). ACV = **replacement cost at time of loss minus depreciation** (919.80(d)(8))."],
+ ['p',"If your estimate is higher, the carrier must respond in writing and **name a contractor who'll do it for their price** — or agree to pay reasonable excess costs (919.80(d)(7)(C))."],
+ ['note','why',"This is one of your strongest claims tools. Make them name the contractor."],
+ ['p',"Carriers can't mark a check 'final' or a 'release' unless limits are paid or there's a real dispute, can't demand proof of loss faster than the policy allows, and can't require a **polygraph** (an EUO is fine if the policy allows it)."],
+ ['note','unv',"The check, proof-of-loss, and polygraph rules are from the Feb guide — not yet confirmed against the rule text."],
+ ['a',"Section 155"],
+ ['h',"Section 155 — bad faith penalties"],
+ ['p',"If the carrier's conduct was **vexatious and unreasonable**, the court can add attorney fees plus the **lesser of: 60% of what's owed, $60,000, or the excess over the pre-suit offer**. It's a remedy attached to winning the contract claim, not a standalone lawsuit."]
+]},
+// ── SECTION II · TERMS & CONCEPTS ──
+{id:"principles",sec:2,title:"Core principles",min:6,topics:["Indemnity","Insurable interest","Good faith","Subrogation","Waiver & estoppel","Causation","Hazards","Terms"],b:[
+ ['a',"Indemnity"],
+ ['h',"Indemnity"],
+ ['p',"Insurance puts the insured back where they were — **no better, no worse**. The insurer pays the **lesser of the loss or the limit**. Exceptions: **replacement cost** coverage and **valued policies**."],
+ ['a',"Insurable interest"],
+ ['h',"Insurable interest"],
+ ['p',"A financial stake in the property. For property, it must exist **at the time of loss** (life insurance: at inception). Sources: ownership, secured creditor (mortgagee), lease, contract rights, legal liability."],
+ ['a',"Good faith"],
+ ['h',"Utmost good faith"],
+ ['ul',["**Representations:** substantially true","**Warranties:** literally true (mostly marine)","**Concealment** of a material fact can void coverage"]],
+ ['p',"In Illinois, a misstatement voids coverage only if made **with intent to deceive** or it **materially affected** the risk (215 ILCS 5/154)."],
+ ['a',"Subrogation"],
+ ['h',"Subrogation"],
+ ['p',"After paying, the insurer **steps into the insured's shoes** to collect from whoever caused the loss. The insured can't impair that right — like signing a release with the at-fault party."],
+ ['note','why',"'Sub' (under) + 'rogare' (to ask): the insurer asks in the insured's place."],
+ ['a',"Waiver & estoppel"],
+ ['h',"Waiver and estoppel"],
+ ['p',"**Waiver** = voluntarily giving up a known right. **Estoppel** = a court bars a party from contradicting earlier conduct someone relied on. Reservation-of-rights letters and non-waiver agreements exist to prevent accidental waiver."],
+ ['note','why',"Adjuster said 'go ahead and tear off,' then denied? That's reliance — an estoppel argument."],
+ ['a',"Causation"],
+ ['h',"Proximate cause"],
+ ['p',"The unbroken chain of events from a peril to the loss. **Direct loss** is the peril's physical damage; **indirect loss** follows from it (interior water after wind opens the roof, living expenses)."],
+ ['a',"Hazards"],
+ ['h',"Hazards"],
+ ['p',"**Peril** causes the loss. **Hazard** makes it likelier. **Moral** hazard = dishonesty (morals). **Morale** hazard = carelessness because you're insured (attitude)."],
+ ['a',"Terms"],
+ ['h',"Quick terms"],
+ ['ul',["**Binder:** temporary proof of coverage","**Bailment:** your property in someone else's care (repair shop)","**Salvage:** damaged property the insurer takes after paying","**Limit of liability:** per occurrence, aggregate, or per item"]]
+]},
+{id:"math",sec:2,title:"The money math",min:5,topics:["Valuation","Coinsurance","Deductibles","Other insurance"],b:[
+ ['a',"Valuation"],
+ ['h',"ACV vs RCV"],
+ ['p',"**ACV = Replacement Cost − Depreciation.** RCV pays full replacement with like kind and quality. Under RCV the insured usually gets **ACV first**, then **recoverable depreciation** after repairs."],
+ ['p',"Example: RC $280,000, ACV $200,000 → depreciation **$80,000**."],
+ ['a',"Coinsurance"],
+ ['h',"Coinsurance — 'Did over Should times Loss'"],
+ ['p',"**Payment = (Carried ÷ Required) × Loss.** Required = value × coinsurance %."],
+ ['p',"Example: $1,000,000 building, 80%, carries $500,000, loss $200,000. Required $800,000. $500K ÷ $800K × $200K = **$125,000**. The insured eats $75,000."],
+ ['note','trap',"If carried ≥ required, there's no penalty — check that before doing any math."],
+ ['a',"Deductibles"],
+ ['h',"Deductibles"],
+ ['ul',["**Flat:** fixed dollars","**Percentage:** on the insured **value**, not the loss — 2% of a $300,000 dwelling = $6,000","**Franchise:** below the threshold nothing; above it, the **whole** loss"]],
+ ['a',"Other insurance"],
+ ['h',"Two policies, one loss"],
+ ['p',"**Pro rata:** (this policy's limit ÷ all limits) × loss. $100K + $300K policies, $80K loss → the $100K policy pays **$20,000**. **Equal shares:** split evenly until the smallest limit runs out."]
+]},
+// ── SECTION I + III · PRODUCTS & POLICY PROVISIONS ──
+{id:"forms",sec:1,title:"Homeowners forms and perils",min:6,topics:["HO forms","HO limits","HO conditions","Water & mold","Contract law"],b:[
+ ['a',"HO forms"],
+ ['h',"Named vs open perils — the burden flip"],
+ ['p',"**Named perils:** only listed perils covered; the **insured proves** a listed peril caused it. **Open perils:** everything unless excluded; the **insurer proves** the exclusion."],
+ ['note','why',"Open perils is your best weapon: make the carrier name the exclusion and prove it applies."],
+ ['tbl',[["Form","Coverage"],["HO-2 Broad","Named perils (16)"],["HO-3 Special","Dwelling OPEN · contents NAMED"],["HO-4 Renters","Contents only, named"],["HO-5 Comprehensive","Open on dwelling AND contents"],["HO-6 Condo","Walls-in + contents"],["HO-7 Mobile home","Like HO-3 for manufactured homes"],["HO-8 Older home","ACV/repair basis, limited perils"]]],
+ ['note','trap',"HO-3 mystery ceiling stain: the dwelling is open perils, so the insurer must prove an exclusion. Can't prove it? Covered."],
+ ['a',"HO limits"],
+ ['note','add',"Not in your Feb guide — standard ISO HO-3 limits the exam pulls from."],
+ ['tbl',[["Coverage","Default"],["B Other structures","10% of A"],["C Personal property","50% of A"],["D Loss of use","30% of A"],["Contents off premises","10% of C (min $1,000)"],["Trees/shrubs","5% of A, $500 per tree, no wind"],["Money","$200"],["Jewelry/furs theft","$1,500"],["Firearms / silverware theft","$2,500"],["Fire dept charge","$500"],["Debris removal","Extra 5% of the limit"]]],
+ ['a',"HO conditions"],
+ ['p',"**Vacant** = no people and no contents. **Unoccupied** = furnished, nobody living there. Vacant **60+ consecutive days** → vandalism and glass coverage drop."],
+ ['a',"Water & mold"],
+ ['p',"A **burst pipe** is sudden and accidental discharge — covered. 'Flood' means outside surface water — excluded. Interior **wind-driven rain** is covered only if wind first made an opening."],
+ ['a',"Contract law"],
+ ['h',"Contract law (Section III)"],
+ ['ul',["Valid contract: **agreement, consideration, competent parties, legal purpose**","**Adhesion:** the insurer wrote it, so ambiguity is read against the insurer","**Aleatory:** unequal exchange based on chance ('alea' = dice)","Policy parts — **DICE:** Declarations, Insuring agreement, Conditions, Exclusions"]]
+]},
+{id:"conditions",sec:3,title:"Policy conditions, SFP and flood",min:5,topics:["Provisions","Standard Fire Policy","NFIP"],b:[
+ ['a',"Provisions"],
+ ['ul',["**Abandonment:** never allowed — the insurer chooses to repair, rebuild, or pay","**Pair and set:** pays the lost piece or drop in value, not the whole set","**Appraisal:** settles the **amount** only, never coverage. Two appraisers pick an umpire; any two agree = binding. Each side pays its appraiser; umpire split","**Mortgage clause:** lender protected even if the owner breaks the policy; gets its own cancellation notice","**Liberalization:** free coverage improvements apply to existing policies automatically","**Assignment:** not before a loss without consent; claim proceeds after a loss, yes"]],
+ ['h',"Duties after loss"],
+ ['p',"Prompt notice, protect the property, inventory, show the damage, **sworn proof of loss**, EUO if required, produce records. Abandonment is never a duty."],
+ ['a',"Standard Fire Policy"],
+ ['h',"1943 New York Standard Fire Policy"],
+ ['ul',["Covers **fire, lightning, and removal**","Proof of loss within **60 days**","Suit within **12 months**","Payment due **60 days** after proof of loss and the loss is set","Created the appraisal procedure and the no-abandonment rule"]],
+ ['note','why',"Illinois pauses the 12-month suit clock from proof of loss until denial (215 ILCS 5/143.1). Denial letters must say how many days are left."],
+ ['a',"NFIP"],
+ ['h',"Flood (NFIP)"],
+ ['ul',["Flood is excluded from standard policies — NFIP is separate","**30-day** waiting period on new policies","Residential max **$250,000 building / $100,000 contents**","**ICC** up to **$30,000** for code-required rebuilding","**Write-Your-Own:** private carriers sell and service NFIP policies"]],
+ ['note','trap',"Flood on a plain HO-3: explain the exclusion and send them to NFIP/FEMA. Filing it as wind is fraud."]
+]},
+{id:"commercial",sec:1,title:"Dwelling, commercial, marine and bonds",min:5,topics:["DP forms","Commercial","Inland marine","Bonds","IL market","Mine subsidence"],b:[
+ ['note','add',"Not in your Feb guide. Section I is 35% of the exam, so this chapter fills the gap."],
+ ['a',"DP forms"],
+ ['h',"Dwelling forms"],
+ ['p',"For rentals, vacant, seasonal, or homes that don't fit HO. **DP-1** basic, ACV · **DP-2** broad named perils · **DP-3** open perils on the dwelling (the HO-3 look-alike)."],
+ ['a',"Commercial"],
+ ['h',"Commercial property"],
+ ['ul',["Causes of loss: **Basic**, **Broad** (adds falling objects, weight of snow/ice, water damage), **Special** = open perils","Vacant **60+ days**: no vandalism, sprinkler leakage, glass, water, theft; other losses cut **15%**","Business income: **72-hour** waiting period","**BOP:** small-business package of property + liability","**Builders risk:** buildings under construction","**Ordinance or law:** A undamaged part · B demolition · C increased construction cost","**Equipment breakdown:** sudden mechanical/electrical failure"]],
+ ['a',"Inland marine"],
+ ['h',"Inland marine"],
+ ['p',"Movable property and goods in transit. Personal articles floaters cover scheduled jewelry and art **open perils at agreed value**. Percentage deductibles here compute on the limit."],
+ ['a',"Bonds"],
+ ['h',"Bonds"],
+ ['p',"**Surety:** three parties — principal, obligee, surety — and the principal repays any claim. That's your $50,000 PA bond. **Fidelity:** covers employee dishonesty."],
+ ['a',"IL market"],
+ ['h',"Illinois specifics"],
+ ['ul',["**FAIR Plan:** basic coverage for people the regular market won't insure","**Insurance Guaranty Fund:** pays covered claims when an insurer goes insolvent"]],
+ ['a',"Mine subsidence"],
+ ['p',"**Mine subsidence is NOT earth movement.** Illinois handles it separately through the Mine Subsidence Insurance Fund."]
+]},
+// ── SECTION IV · BUILDING & ESTIMATING ──
+{id:"building",sec:4,title:"Building and estimating",min:4,topics:["Roofing","Hail","Electrical","Water","Estimating"],b:[
+ ['note','add',"Not in your Feb guide — Section IV is 10 questions. Most of it you know from the field; this is the textbook version."],
+ ['a',"Roofing"],
+ ['ul',["**1 square = 100 sq ft**","Pitch 6/12 = 6 in rise per 12 in run","Rafters per side = (length ÷ spacing) **+ 1**. 32 ft at 16 in O.C. = 25","**Trusses:** never notch or cut without **written engineer approval**","Waste: ~10% gable, ~15% hip"]],
+ ['a',"Hail"],
+ ['p',"**Functional** damage hurts the roof's ability to shed water or its life; **cosmetic** is appearance only — and some policies exclude it."],
+ ['a',"Electrical"],
+ ['ul',["**Watts = Volts × Amps**","15 A → **14-gauge**; 20 A → **12-gauge** (lower number = thicker)","**GFCI** in wet areas; AFCI in living areas","120 V outlets, 240 V big appliances"]],
+ ['a',"Water"],
+ ['p',"IICRC S500: **Cat 1** clean · **Cat 2** gray · **Cat 3** black (sewage, rising flood water). Categories get worse with time. Classes 1–4 measure how much is wet, not contamination."],
+ ['a',"Estimating"],
+ ['ul',["Board foot = **144 cubic inches**","4×8 drywall = **32 sq ft**","**O&P** 10% + 10% when a GC is needed to coordinate trades","Concrete hits design strength at **28 days**","Higher **R-value** = better insulation"]]
+]},
+{id:"ethics",sec:2,title:"Ethics and fiduciary duty",min:3,topics:["Ethics terms"],b:[
+ ['a',"Ethics terms"],
+ ['p',"The PA works only for the policyholder: no settling without consent, no hidden financial interests, account for every dollar."],
+ ['ul',["**Rebating:** value given as an inducement. For PAs: a fee discount for using your contractor — prohibited","**Twisting:** replacing a policy through misrepresentation (producer concept)","**Churning:** new policies just for commissions (producer concept)","**Commingling:** mixing client money with yours","**Misappropriation:** taking it — Class 4 felony"]],
+ ['p',"Fraud the exam expects you to spot: inflated claims, fake losses, false proofs of loss, unauthorized fees, kickbacks, unlicensed work."]
+]},
+{id:"numbers",sec:0,title:"Number sheet",min:3,topics:[],b:[
+ ['p',"The numbers exam writers love. Look-alikes are grouped so they stop blending together."],
+ ['h',"The 5s"],
+ ['tbl',[["Number","Means"],["5 business days","Cancel window (after carrier receives contract)"],["5 business days","Email contract copy to carrier"],["5 business days","Policy-limits paid → no % fee"],["5 years","Wait after revocation"]]],
+ ['h',"The 15s and 21"],
+ ['tbl',[["Number","Means"],["15 business days","Refund after cancellation"],["15 working days","Carrier responds to communications"],["21 working days","Carrier contacts parties after notice"]]],
+ ['h',"The 30s"],
+ ['tbl',[["Number","Means"],["30 days","Address change to Director"],["30 days","Report action in another state"],["30 days","Carrier offers payment after liability"],["30 days","Carrier explains denial"],["30 days","NFIP waiting period"],["30 days","Wait to retake after 2nd fail"]]],
+ ['h',"The 60s and up"],
+ ['tbl',[["Number","Means"],["60 days","Proof of loss (SFP)"],["60 days","Vacancy restriction"],["40 / 75 days","Fire/EC delay benchmarks"],["12 months","Suit limit (SFP)"],["7 years","Record retention"]]],
+ ['h',"Money"],
+ ['tbl',[["Number","Means"],["$50,000","PA bond"],["$250 / $500","License: resident / nonresident"],["$92","Exam fee"],["10%","Fee cap"],["$10K / $100K","Civil penalty"],["$60,000","§155 cap"],["$250K / $100K","NFIP building / contents"],["24 hrs / 3 ethics","CE per 2 years"]]]
+]}
+];
+
+
+// ════════ Setup ════════
 const EXAM={1:.35,2:.25,3:.05,4:.10,5:.25};
-const SEC={1:"Products",2:"Terms",3:"Contract",4:"Building",5:"IL Law"};
+const SECNAME={0:"Start here",1:"I · Property products — 35%",2:"II · Terms & concepts — 25%",3:"III · Policy provisions — 5%",4:"IV · Building & estimating — 10%",5:"V · Illinois law — 25%"};
 const SECSHORT={1:"I PROD",2:"II TERMS",3:"III CONTR",4:"IV BLDG",5:"V IL LAW"};
-const BATCH=6;            // Learn mode: new facts in small batches
-const LOCK_MS=1000;       // answers unlock after 1s so the whole question gets read
-const RUSH_MS=3000;       // wrong answer faster than this after unlock = "rushed"
-const KEY='pa-drill-v5';
+const SECORDER=[0,5,2,1,3,4];
+const BATCH=6,LOCK_MS=1000,RUSH_MS=3000,KEY='pa-drill-v5';
+const RUSH_TXT='Rushed — you answered in under 3 seconds.';
 const hasClaudeStore=!!(window.storage&&typeof window.storage.get==='function');
 const $=id=>document.getElementById(id);
 const el={qCat:$('qCat'),qSeen:$('qSeen'),qText:$('qText'),opts:$('opts'),exp:$('exp'),card:$('card'),nextBtn:$('nextBtn'),
-  today:$('sToday'),acc:$('sAcc'),weak:$('sWeak'),rush:$('sRush'),streak:$('streak'),mastery:$('mastery'),reset:$('resetBtn')};
+  today:$('sToday'),acc:$('sAcc'),weak:$('sWeak'),rush:$('sRush'),streak:$('streak'),reset:$('resetBtn'),
+  vStudy:$('vStudy'),vDrill:$('vDrill'),chHome:$('chHome'),chRead:$('chRead'),reader:$('reader'),rPane:$('rPane'),rTitle:$('rTitle'),chChip:$('chChip')};
 
 function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36);}
 Q.forEach(q=>{q.id=hash(q.q);});
 const secCount={};Q.forEach(q=>{secCount[q.s]=(secCount[q.s]||0)+1;});
+const T2CH={};CH.forEach(c=>c.topics.forEach(t=>{T2CH[t]=c.id;}));
+const CHBY={};CH.forEach(c=>{CHBY[c.id]=c;});
+const chQs=id=>{const c=CHBY[id];return Q.map((q,i)=>i).filter(i=>c.topics.includes(Q[i].t));};
 
 let S=fresh();
-let filter='all',cur=-1,answered=false,teaching=false,recent=[],unlockAt=0,lockTimer;
+let view='study',openCh=null,filter='all',cur=-1,answered=false,teaching=false,recent=[],unlockAt=0,lockTimer;
 
-function fresh(){return {q:{},today:{d:dkey(),n:0,c:0},streak:0};}
+function fresh(){return {q:{},today:{d:dkey(),n:0,c:0},streak:0,read:{},pos:{},last:null,view:'study'};}
 function dkey(){const x=new Date();return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
 function stat(i){return S.q[Q[i].id]||{c:0,w:0,s:0,f:0,t:0};}
-const seen=t=>t.c+t.w;
-const isWeak=t=>t.w>0&&t.s<2;
-const mastered=t=>t.s>=2;
+const seen=t=>t.c+t.w, isWeak=t=>t.w>0&&t.s<2, mastered=t=>t.s>=2;
 
 async function load(){
   try{
     let raw=null;
     if(hasClaudeStore){const r=await window.storage.get(KEY);raw=r&&r.value;}
     if(!raw)raw=localStorage.getItem(KEY);
-    if(raw){const p=JSON.parse(raw);S={...fresh(),...p,today:{...fresh().today,...(p.today||{})},q:p.q||{}};}
+    if(raw){const p=JSON.parse(raw);const f=fresh();S={...f,...p,today:{...f.today,...(p.today||{})},q:p.q||{},read:p.read||{},pos:p.pos||{}};}
   }catch(e){}
   if(S.today.d!==dkey())S.today={d:dkey(),n:0,c:0};
   $('bankN').textContent=Q.length;
-  next();renderStats();
+  renderHome();renderStats();next();
+  show(S.view==='drill'?'drill':'study');
 }
 let saveTimer;
 function save(){
@@ -365,45 +666,128 @@ function save(){
     const json=JSON.stringify(S);
     try{localStorage.setItem(KEY,json);}catch(e){}
     try{if(hasClaudeStore)await window.storage.set(KEY,json);}catch(e){}
-  },150);
+  },200);
 }
 
+// ════════ Tabs ════════
+function show(v){
+  view=v;S.view=v;save();
+  el.vStudy.hidden=v!=='study';el.vDrill.hidden=v!=='drill';
+  for(const t of $('tabs').children)t.classList.toggle('on',t.dataset.v===v);
+  if(v==='drill')requestAnimationFrame(fit);
+}
+$('tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(t)show(t.dataset.v);});
+
+// ════════ Study ════════
+function inline(parent,text){            // **bold** → <strong>, everything else as plain text
+  text.split('**').forEach((part,i)=>{
+    if(!part)return;
+    if(i%2){const s=document.createElement('strong');s.textContent=part;parent.append(s);}else parent.append(part);
+  });
+}
+const NOTE={why:"Now why is that important?",upd:"Updated — the rule changed",trap:"Exam trap",add:"Added — not in your Feb guide",unv:"Not yet confirmed"};
+function chProgress(id){const qs=chQs(id);return {n:qs.length,m:qs.filter(i=>mastered(stat(i))).length};}
+
+function renderHome(){
+  const h=el.chHome;h.replaceChildren();
+  const last=S.last&&CHBY[S.last];
+  const nextUnread=CH.find(c=>!S.read[c.id]);
+  const target=last&&!S.read[last.id]?last:(nextUnread||last||CH[0]);
+  const b=document.createElement('button');b.className='cont';
+  const sm=document.createElement('small');sm.textContent=(last&&target===last)?'Pick up where you left off':'Next up';
+  const sp=document.createElement('span');sp.textContent=target.title;
+  b.append(sm,sp);b.onclick=()=>openChapter(target.id);h.append(b);
+  for(const sec of SECORDER){
+    const list=CH.filter(c=>c.sec===sec);if(!list.length)continue;
+    const g=document.createElement('div');g.className='grp';g.textContent=SECNAME[sec];h.append(g);
+    for(const c of list){
+      const r=document.createElement('button');r.className='row'+(S.read[c.id]?' read':'');
+      const k=document.createElement('span');k.className='chk';k.textContent=S.read[c.id]?'✓':'';
+      const tt=document.createElement('span');tt.className='tt';
+      const bb=document.createElement('b');bb.textContent=c.title;
+      const pr=chProgress(c.id);
+      const s2=document.createElement('span');s2.textContent=c.min+' min read'+(pr.n?' · '+pr.m+'/'+pr.n+' questions mastered':'');
+      tt.append(bb,s2);
+      if(pr.n){const bar=document.createElement('div');bar.className='bar';const i=document.createElement('i');i.style.width=Math.round(100*pr.m/pr.n)+'%';bar.append(i);tt.append(bar);}
+      r.append(k,tt);r.onclick=()=>openChapter(c.id);h.append(r);
+    }
+  }
+}
+function renderChapter(c){
+  const a=el.reader;a.replaceChildren();
+  const h=document.createElement('h2');h.textContent=c.title;a.append(h);
+  let anchorEl=null;
+  for(const blk of c.b){
+    const [k,x,y]=blk;let n;
+    if(k==='a'){anchorEl=document.createElement('div');anchorEl.className='anchor';anchorEl.dataset.topic=x;a.append(anchorEl);continue;}
+    if(k==='h'){n=document.createElement('h3');n.textContent=x;}
+    else if(k==='p'){n=document.createElement('p');inline(n,x);}
+    else if(k==='ul'){n=document.createElement('ul');for(const it of x){const li=document.createElement('li');inline(li,it);n.append(li);}}
+    else if(k==='tbl'){n=document.createElement('div');n.className='tblw';const t=document.createElement('table');
+      x.forEach((row,ri)=>{const tr=document.createElement('tr');row.forEach(cell=>{const td=document.createElement(ri?'td':'th');inline(td,cell);tr.append(td);});t.append(tr);});n.append(t);}
+    else if(k==='note'){n=document.createElement('div');n.className='note '+x;const b=document.createElement('b');b.textContent=NOTE[x];n.append(b);inline(n,y);}
+    (anchorEl||a).append(n);
+  }
+  const qn=chQs(c.id).length;
+  $('quizBtn').textContent=qn?('QUIZ ME ON THIS ('+qn+') →'):'BACK TO CHAPTERS';
+}
+function openChapter(id,topic){
+  const c=CHBY[id];if(!c)return;
+  openCh=id;S.last=id;save();
+  el.chHome.hidden=true;el.chRead.hidden=false;
+  el.rTitle.textContent=SECNAME[c.sec].split(' — ')[0];
+  renderChapter(c);
+  show('study');
+  requestAnimationFrame(()=>{
+    let y=S.pos[id]||0;
+    if(topic){const t=el.reader.querySelector('.anchor[data-topic="'+CSS.escape(topic)+'"]');
+      if(t){y=t.offsetTop-8;t.classList.remove('flash');void t.offsetWidth;t.classList.add('flash');}}
+    el.rPane.scrollTop=y;
+  });
+}
+function closeChapter(){openCh=null;el.chRead.hidden=true;el.chHome.hidden=false;renderHome();}
+$('backBtn').onclick=closeChapter;
+let posTimer;
+el.rPane.addEventListener('scroll',()=>{
+  if(!openCh)return;
+  clearTimeout(posTimer);
+  posTimer=setTimeout(()=>{
+    const p=el.rPane;S.pos[openCh]=p.scrollTop;
+    if(p.scrollTop+p.clientHeight>=p.scrollHeight-40)S.read[openCh]=true;   // reached the end = read
+    save();
+  },150);
+},{passive:true});
+$('quizBtn').onclick=()=>{
+  if(!openCh)return;
+  S.read[openCh]=true;save();
+  if(!chQs(openCh).length){closeChapter();return;}
+  setFilter('ch:'+openCh);show('drill');
+};
+
+// ════════ Drill ════════
 function weight(i){
-  const t=stat(i);
-  let w;
-  if(!seen(t))w=3;
-  else if(t.s<0)w=4+Math.min(-t.s,3);
-  else if(t.s>=3)w=.3;
-  else if(t.s>=1)w=1;
-  else w=2;
-  if(t.f)w*=1.3;                                   // rushed misses come back a bit more
+  const t=stat(i);let w;
+  if(!seen(t))w=3; else if(t.s<0)w=4+Math.min(-t.s,3); else if(t.s>=3)w=.3; else if(t.s>=1)w=1; else w=2;
+  if(t.f)w*=1.3;
   if(filter==='all'||filter==='weak'||filter==='traps')w*=EXAM[Q[i].s]/(secCount[Q[i].s]/Q.length);
   return w;
 }
-function learnPool(){
-  const p=[];
-  for(let i=0;i<Q.length&&p.length<BATCH;i++)if(!mastered(stat(i)))p.push(i);
-  return p;
-}
 function pool(){
-  if(filter==='learn')return learnPool();
+  if(filter==='learn'){const p=[];for(let i=0;i<Q.length&&p.length<BATCH;i++)if(!mastered(stat(i)))p.push(i);return p;}
+  if(filter.startsWith('ch:'))return chQs(filter.slice(3));
   const p=[];
   for(let i=0;i<Q.length;i++){
     const t=stat(i),q=Q[i];
     if(filter==='weak'&&!isWeak(t))continue;
     if(filter==='traps'&&!q.nt)continue;
-    if(filter[0]==='s'&&q.s!==+filter[1])continue;
+    if(/^s\d$/.test(filter)&&q.s!==+filter[1])continue;
     p.push(i);
   }
   return p;
 }
 function pick(){
-  const p=pool();
-  if(!p.length)return -1;
-  if(filter==='learn'){                            // teach unseen cards in order; then quiz the batch
-    const unseen=p.find(i=>!stat(i).t&&!seen(stat(i)));
-    if(unseen!==undefined)return unseen;
-  }
+  const p=pool();if(!p.length)return -1;
+  if(filter==='learn'){const u=p.find(i=>!stat(i).t&&!seen(stat(i)));if(u!==undefined)return u;}
   const avoid=Math.min(recent.length,p.length-1,filter==='learn'?2:6);
   const block=new Set(recent.slice(recent.length-avoid));
   const pp=p.filter(i=>!block.has(i));
@@ -411,45 +795,34 @@ function pick(){
   for(let j=0;j<pp.length;j++){r-=ws[j];if(r<=0)return pp[j];}
   return pp[pp.length-1];
 }
-function shuffled(n,keep){
-  const a=[...Array(n).keys()];
-  if(keep)return a;
-  for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
-  return a;
-}
-// Trap words get highlighted so they can't be skimmed past
+function shuffled(n,keep){const a=[...Array(n).keys()];if(keep)return a;for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function renderQ(text){
   const frag=document.createDocumentFragment();
   text.split(/\b(NOT|EXCEPT|FALSE|LESSER|BOTH|AFTER|BEFORE|ONLY|ALL)\b/).forEach((part,i)=>{
-    if(i%2){const m=document.createElement('mark');m.textContent=part;frag.append(m);}
-    else frag.append(part);
+    if(i%2){const m=document.createElement('mark');m.textContent=part;frag.append(m);}else frag.append(part);
   });
   el.qText.replaceChildren(frag);
 }
-function setExp(q,state){
-  // state: 'teach' | 'right' | 'wrong'
+function setExp(q){
   const parts=[];
   const add=(cls,label,text)=>{if(!text)return;const d=document.createElement('div');d.className='xrow '+cls;
-    if(label){const b=document.createElement('b');b.textContent=label;d.append(b,' ');}
-    d.append(text);parts.push(d);};
-  add('rule','',q.w);
-  add('why','Now why is that important?',q.i);
-  add('conf',"Don't confuse:",q.k);
-  const c=document.createElement('div');c.className='cite';
-  c.textContent=q.x+(q.v===0?' · not yet confirmed against statute text':'');
-  if(q.v===0)c.classList.add('unv');
-  parts.push(c);
+    if(label){const b=document.createElement('b');b.textContent=label;d.append(b,' ');}d.append(text);parts.push(d);};
+  add('rule','',q.w);add('why','Now why is that important?',q.i);add('conf',"Don't confuse:",q.k);
+  const c=document.createElement('div');c.className='cite'+(q.v===0?' unv':'');
+  c.textContent=q.x+(q.v===0?' · not yet confirmed against statute text':'');parts.push(c);
+  const chId=T2CH[q.t];
+  if(chId){const b=document.createElement('button');b.className='readlink';b.textContent='📖 Read this in Study: '+CHBY[chId].title+' →';
+    b.onclick=()=>openChapter(chId,q.t);parts.push(b);}
   el.exp.replaceChildren(...parts);
 }
-
 function next(){
   clearTimeout(lockTimer);
   cur=pick();answered=false;teaching=false;
   el.opts.classList.remove('locked');
   el.exp.className='exp pending';el.nextBtn.disabled=true;el.nextBtn.textContent='NEXT →';
   if(cur<0){
-    const msg=filter==='learn'?'Every card is mastered. Switch to All for mixed review.':'Nothing here yet. Try another filter.';
-    el.qText.textContent=msg;el.opts.replaceChildren();el.exp.replaceChildren();el.qCat.textContent='';el.qSeen.textContent='';return;
+    el.qText.textContent=filter==='learn'?'Every card is mastered. Switch to Exam Mix for review.':'Nothing here yet. Try another filter.';
+    el.opts.replaceChildren();el.exp.replaceChildren();el.qCat.textContent='';el.qSeen.textContent='';return;
   }
   recent.push(cur);if(recent.length>8)recent.shift();
   const q=Q[cur],t=stat(cur);
@@ -457,120 +830,94 @@ function next(){
   el.qCat.textContent=(teaching?'LEARN · ':'')+SECSHORT[q.s]+' · '+q.t;
   el.qSeen.textContent=teaching?'NEW FACT':(seen(t)?('seen '+seen(t)+'× · '+(t.w?t.w+' missed':'clean')):'NEW');
   renderQ(q.q);
-  const order=shuffled(q.o.length,q.fix);
   const frag=document.createDocumentFragment();
-  order.forEach((orig,pos)=>{
-    const b=document.createElement('button');
-    b.className='opt';b.dataset.j=orig;
+  shuffled(q.o.length,q.fix).forEach((orig,pos)=>{
+    const b=document.createElement('button');b.className='opt';b.dataset.j=orig;
     const l=document.createElement('span');l.className='ltr';l.textContent=String.fromCharCode(65+pos)+'.';
-    const s=document.createElement('span');s.textContent=q.o[orig];
-    b.append(l,s);frag.append(b);
+    const s=document.createElement('span');s.textContent=q.o[orig];b.append(l,s);frag.append(b);
   });
   el.opts.replaceChildren(frag);
-  setExp(q);
-  el.exp.dataset.verdict='Rushed — you answered in under 3 seconds.'; // reserve room for it
-  fit();
-  el.card.scrollTop=0;
-  if(teaching){                                    // show the answer first — learn it, then get tested on it later
+  setExp(q);el.exp.dataset.verdict=RUSH_TXT;   // reserve room for the longest state so nothing jumps
+  fit();el.card.scrollTop=0;
+  if(teaching){
     for(const b of el.opts.children)b.classList.add(+b.dataset.j===q.a?'right':'faded');
     el.exp.className='exp teach';el.exp.dataset.verdict='';
-    el.nextBtn.disabled=false;el.nextBtn.textContent='GOT IT → QUIZ ME LATER';
-    return;
+    el.nextBtn.disabled=false;el.nextBtn.textContent='GOT IT → QUIZ ME LATER';return;
   }
   el.opts.classList.add('locked');
   lockTimer=setTimeout(()=>{el.opts.classList.remove('locked');unlockAt=performance.now();},LOCK_MS);
 }
-
 function answer(j){
   if(answered||teaching||cur<0||el.opts.classList.contains('locked'))return;answered=true;
-  const q=Q[cur],t={...stat(cur)},right=j===q.a;
-  const rushed=!right&&(performance.now()-unlockAt)<RUSH_MS;
-  for(const b of el.opts.children){
-    const k=+b.dataset.j;
-    b.classList.add(k===q.a?'right':k===j?'wrong':'faded');
-  }
+  const q=Q[cur],t={...stat(cur)},right=j===q.a,rushed=!right&&(performance.now()-unlockAt)<RUSH_MS;
+  for(const b of el.opts.children){const k=+b.dataset.j;b.classList.add(k===q.a?'right':k===j?'wrong':'faded');}
   if(right){t.c++;t.s=t.s>0?t.s+1:1;S.streak++;S.today.c++;}
   else{t.w++;t.s=t.s<0?t.s-1:-1;S.streak=0;if(rushed)t.f=(t.f||0)+1;}
   S.q[q.id]=t;S.today.n++;
-  el.exp.className='exp '+(right?'ok':'bad');
-  el.exp.dataset.verdict=right?'':(rushed?'Rushed — you answered in under 3 seconds.':'');
+  el.exp.className='exp '+(right?'ok':'bad');el.exp.dataset.verdict=rushed?RUSH_TXT:'';
   el.nextBtn.disabled=false;
   el.card.scrollTo({top:el.card.scrollHeight,behavior:'smooth'});
   save();renderStats();
 }
-
 el.opts.addEventListener('click',e=>{const b=e.target.closest('.opt');if(b)answer(+b.dataset.j);});
 el.nextBtn.addEventListener('click',()=>{
   if(teaching&&cur>=0){const q=Q[cur],t={...stat(cur)};t.t=1;S.q[q.id]=t;save();}
   next();
 });
-$('filters').addEventListener('click',e=>{
-  const c=e.target.closest('.chip');if(!c||!c.dataset.f)return;
-  filter=c.dataset.f;recent=[];
-  for(const x of $('filters').children)if(x.dataset.f)x.classList.toggle('on',x===c);
+function setFilter(f){
+  filter=f;recent=[];
+  if(f.startsWith('ch:')){const c=CHBY[f.slice(3)];el.chChip.hidden=false;el.chChip.dataset.f=f;el.chChip.textContent='📖 '+c.title;}
+  for(const x of $('filters').children)if(x.dataset.f!==undefined)x.classList.toggle('on',x.dataset.f===f);
+  $('filters').scrollLeft=0;
   next();
-});
+}
+$('filters').addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c||!c.dataset.f)return;setFilter(c.dataset.f);});
 
 function renderStats(){
   el.today.textContent=S.today.n;
   el.acc.textContent=S.today.n?Math.round(100*S.today.c/S.today.n)+'%':'—';
   el.streak.textContent=S.streak>1?'🔥 '+S.streak:'';
-  const tot={},mas={};let weak=0,rush=0;
-  for(const k in SEC){tot[k]=0;mas[k]=0;}
-  for(let i=0;i<Q.length;i++){
-    const t=stat(i),s=Q[i].s;tot[s]++;
-    if(mastered(t))mas[s]++;
-    if(isWeak(t))weak++;
-    if(t.f&&t.s<2)rush++;
-  }
+  let weak=0,rush=0;
+  for(let i=0;i<Q.length;i++){const t=stat(i);if(isWeak(t))weak++;if(t.f&&t.s<2)rush++;}
   el.weak.textContent=weak;el.rush.textContent=rush;
-  el.mastery.innerHTML=Object.keys(SEC).map(s=>
-    '<div><div class="mlabel"><span>'+SECSHORT[s].split(' ')[0]+'</span><span>'+mas[s]+'/'+tot[s]+'</span></div><div class="mtrack"><div class="mfill" style="width:'+Math.round(100*mas[s]/tot[s])+'%"></div></div></div>'
-  ).join('');
+  if(!openCh)renderHome();
 }
-
 let armTimer;
 el.reset.addEventListener('click',()=>{
   if(!el.reset.classList.contains('armed')){
     el.reset.classList.add('armed');el.reset.textContent='Tap again to wipe';
-    clearTimeout(armTimer);
-    armTimer=setTimeout(()=>{el.reset.classList.remove('armed');el.reset.textContent='Reset Progress';},3000);
-    return;
+    clearTimeout(armTimer);armTimer=setTimeout(()=>{el.reset.classList.remove('armed');el.reset.textContent='Reset Progress';},3000);return;
   }
   clearTimeout(armTimer);el.reset.classList.remove('armed');el.reset.textContent='Progress wiped';
   setTimeout(()=>{el.reset.textContent='Reset Progress';},1800);
-  S=fresh();recent=[];save();next();renderStats();
+  S={...fresh(),view:'drill'};recent=[];save();next();renderStats();
 });
 
-// ── Game-style scaling: designed at 420 units (iPhone Air), scaled to any screen, centered ──
+// ════════ Game-style scaling ════════
 const DESIGN_W=420,MIN_H=780;
 let U=1;
 function setScale(){
-  const f=document.getElementById('frame');
-  const w=f.clientWidth,h=f.clientHeight;
-  if(window.scrollY||document.documentElement.scrollTop)window.scrollTo(0,0);
-  U=Math.max(.6,Math.min(w/DESIGN_W,h/MIN_H));
+  const f=$('frame'),w=f.clientWidth,h=f.clientHeight;
+  U=Math.max(.45,Math.min(w/DESIGN_W,h/MIN_H));
   document.documentElement.style.setProperty('--u',U+'px');
+  if(window.scrollY)window.scrollTo(0,0);
 }
-// Biggest text that fits this question + its full explanation (room is reserved, so nothing jumps)
 function fit(){
-  if(cur<0)return;
+  if(cur<0||el.vDrill.hidden)return;
   const card=el.card,root=document.documentElement.style;
-  for(let q=30;q>=14;q-=.5){
+  for(let q=30;q>=13;q-=.5){
     root.setProperty('--qs',(q*U)+'px');
-    root.setProperty('--os',(Math.max(13.5,q*.8)*U)+'px');
-    root.setProperty('--es',(Math.max(13,q*.64)*U)+'px');
+    root.setProperty('--os',(Math.max(13,q*.8)*U)+'px');
+    root.setProperty('--es',(Math.max(12.5,q*.64)*U)+'px');
     if(card.scrollHeight<=card.clientHeight)break;
   }
 }
 function relayout(){setScale();fit();}
 let rq;const onResize=()=>{cancelAnimationFrame(rq);rq=requestAnimationFrame(relayout);};
 addEventListener('resize',onResize);
-addEventListener('scroll',()=>{if(window.scrollY)window.scrollTo(0,0);},{passive:true});
 addEventListener('orientationchange',onResize);
 if(window.visualViewport)visualViewport.addEventListener('resize',onResize);
 addEventListener('scroll',()=>{if(window.scrollY)window.scrollTo(0,0);},{passive:true});
-addEventListener('orientationchange',onResize);
 setScale();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
 
